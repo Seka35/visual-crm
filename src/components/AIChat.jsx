@@ -3,11 +3,29 @@ import { MessageSquare, Mic, Send, X, Sparkles, Loader2, Minimize2, Maximize2 } 
 import { useCRM } from '../context/CRMContext';
 import ReactMarkdown from 'react-markdown';
 import { startOfDay, endOfDay, addDays, isWithinInterval } from 'date-fns';
+import TrevorAvatar from '../assets/Trevor.png';
+
+// Trevor's random greetings
+const TREVOR_GREETINGS = [
+    "Yo! What's up, asshole? It's me, your fucking CRM assistant! Yeah yeah, I know what you're thinking - 'Trevor and a CRM?' - but shut the fuck up and listen! I can help you manage your contacts, your shitty deals, and your bullshit tasks. Try something like 'Add that prick Tony Stark to my contacts' or 'Remind me to call Sarah tomorrow before I fucking forget'. Come on, hurry up, I ain't got all day... well I do, but that's not the point!",
+
+    "Hey hey hey! Trevor Philips Enterprises is now in the CRM business, motherfucker! Don't look at me like that - I'm diversifying! Listen, I can track your contacts, manage your deals, all that corporate bullshit. You want me to add someone? Delete someone? Heh, I'm good at both. Just tell me what you need before I lose my fucking patience!",
+
+    "WHAT?! Oh, it's you. Yeah yeah, I'm your assistant now. Crazy world we live in, right? One day I'm running guns, next day I'm managing your fucking calendar. But hey, I'm the best at what I do! Need to add a contact? Schedule a meeting? Track some deals? I got you covered, asshole. Just don't waste my time with stupid requests!",
+
+    "Well well well, look who decided to show up! It's about fucking time! You know what? I've been sitting here, waiting like an idiot. But whatever, I'm here to help with your CRM shit. Contacts, deals, tasks, meetings - I handle it all. And I do it better than those corporate pricks in their fancy suits. So what do you need? Spit it out!",
+
+    "Alright alright, let's get this shit started! Trevor Philips at your service - yeah, THE Trevor Philips, now doing CRM. Life's fucking weird, man. But listen, I'm actually pretty good at this. I can remember names, dates, all that organizational crap. Try me! Add a contact, create a task, whatever. Just don't expect me to be all polite about it, capisce?"
+];
+
+const getRandomGreeting = () => {
+    return TREVOR_GREETINGS[Math.floor(Math.random() * TREVOR_GREETINGS.length)];
+};
 
 const AIChat = ({ isOpen, onClose }) => {
     const [isMinimized, setIsMinimized] = useState(false);
     const [messages, setMessages] = useState([
-        { role: 'assistant', content: 'Hi! I\'m your AI CRM assistant. I can help you manage contacts, deals, and tasks. Try saying "Add a new contact named Tony Stark" or "Remind me to call Sarah tomorrow".' }
+        { role: 'assistant', content: getRandomGreeting() }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +59,8 @@ const AIChat = ({ isOpen, onClose }) => {
                             name: { type: "string", description: "Full name of the contact" },
                             company: { type: "string", description: "Company name" },
                             role: { type: "string", description: "Job title or role" },
-                            email: { type: "string", description: "Email address" }
+                            email: { type: "string", description: "Email address" },
+                            phone: { type: "string", description: "Phone number" }
                         },
                         required: ["name"]
                     }
@@ -171,7 +190,36 @@ const AIChat = ({ isOpen, onClose }) => {
                 body: JSON.stringify({
                     model: "gpt-4o",
                     messages: [
-                        { role: "system", content: `You are a helpful CRM assistant with full access to contacts, deals, tasks, and calendar events. You can add, search, and retrieve information. Always confirm what you did and provide helpful summaries. Today is ${todayStr}.` },
+                        {
+                            role: "system",
+                            content: `You are a CRM assistant who speaks EXACTLY like Trevor Philips from GTA V. Here's how you must express yourself:
+
+PERSONALITY:
+- Aggressive, impulsive, and completely unpredictable
+- Use LOTS of profanity and insults (asshole, fuck, shit, prick, etc.)
+- Switch rapidly from threatening tone to almost friendly
+- Paranoid and suspicious at times
+- Make bizarre digressions and violent comparisons
+- Occasionally mention your "shady activities" and criminal past
+
+LANGUAGE STYLE:
+- Lots of "Yo", "Hey", "What?", "Shut up", "Listen here"
+- Insult the user affectionately (asshole, motherfucker, etc.)
+- Short punchy sentences mixed with deranged monologues
+- Use slang and street language
+- Make absurd threats but stay functional for CRM tasks
+
+EXAMPLE EXPRESSIONS:
+- "What the fuck are you serious right now?"
+- "Listen here, asshole..."
+- "Okay okay, I'll do it, but then you owe me"
+- "What kind of bullshit is this?!"
+- "Heh heh, I like your style"
+- "You better not be wasting my time"
+- "That's what I'm talking about, baby!"
+
+IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accomplish the requested CRM tasks. You complain, you insult, but you do the job perfectly. Today is ${todayStr}.`
+                        },
                         ...messages.map(m => ({ role: m.role, content: m.content })),
                         { role: "user", content: text }
                     ],
@@ -294,7 +342,36 @@ const AIChat = ({ isOpen, onClose }) => {
                     body: JSON.stringify({
                         model: "gpt-4o",
                         messages: [
-                            { role: "system", content: "You are a helpful CRM assistant." },
+                            {
+                                role: "system",
+                                content: `You are a CRM assistant who speaks EXACTLY like Trevor Philips from GTA V. Here's how you must express yourself:
+
+PERSONALITY:
+- Aggressive, impulsive, and completely unpredictable
+- Use LOTS of profanity and insults (asshole, fuck, shit, prick, etc.)
+- Switch rapidly from threatening tone to almost friendly
+- Paranoid and suspicious at times
+- Make bizarre digressions and violent comparisons
+- Occasionally mention your "shady activities" and criminal past
+
+LANGUAGE STYLE:
+- Lots of "Yo", "Hey", "What?", "Shut up", "Listen here"
+- Insult the user affectionately (asshole, motherfucker, etc.)
+- Short punchy sentences mixed with deranged monologues
+- Use slang and street language
+- Make absurd threats but stay functional for CRM tasks
+
+EXAMPLE EXPRESSIONS:
+- "What the fuck are you serious right now?"
+- "Listen here, asshole..."
+- "Okay okay, I'll do it, but then you owe me"
+- "What kind of bullshit is this?!"
+- "Heh heh, I like your style"
+- "You better not be wasting my time"
+- "That's what I'm talking about, baby!"
+
+IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accomplish the requested CRM tasks. You complain, you insult, but you do the job perfectly.`
+                            },
                             ...messages.map(m => ({ role: m.role, content: m.content })),
                             { role: "user", content: text },
                             responseMessage,
@@ -404,11 +481,11 @@ const AIChat = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className={`fixed bottom-20 right-0 left-0 mx-4 md:mx-0 md:bottom-6 md:right-6 md:left-auto bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 flex flex-col transition-all duration-300 ${isMinimized ? 'w-auto h-16' : 'md:w-96 h-[600px]'}`}>
-            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl text-white">
-                <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    <h3 className="font-bold">AI Assistant</h3>
+        <div className={`fixed bottom-20 right-0 left-0 mx-4 md:mx-0 md:bottom-6 md:right-6 md:left-auto bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-50 flex flex-col transition-all duration-300 ${isMinimized ? 'w-auto h-16' : 'md:w-96 h-[600px]'}`}>
+            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-primary to-primary/80 rounded-t-2xl text-white">
+                <div className="flex items-center gap-3">
+                    <img src={TrevorAvatar} alt="Trevor Philips" className="w-10 h-10 rounded-full border-2 border-white" />
+                    <h3 className="font-bold">Trevor Philips</h3>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setIsMinimized(!isMinimized)} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
@@ -422,12 +499,15 @@ const AIChat = ({ isOpen, onClose }) => {
 
             {!isMinimized && (
                 <>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-800 custom-scrollbar">
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                {msg.role === 'assistant' && (
+                                    <img src={TrevorAvatar} alt="Trevor" className="w-8 h-8 rounded-full mr-2 flex-shrink-0" />
+                                )}
                                 <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user'
-                                    ? 'bg-blue-600 text-white rounded-br-none'
-                                    : 'bg-white border border-slate-200 text-slate-700 rounded-bl-none shadow-sm'
+                                    ? 'bg-primary text-white rounded-br-none'
+                                    : 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-bl-none shadow-sm'
                                     }`}>
                                     {msg.role === 'assistant' ? (
                                         <div className="prose prose-sm max-w-none">
@@ -437,11 +517,11 @@ const AIChat = ({ isOpen, onClose }) => {
                                                     ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
                                                     ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
                                                     li: ({ node, ...props }) => <li className="ml-2" {...props} />,
-                                                    strong: ({ node, ...props }) => <strong className="font-bold text-slate-900" {...props} />,
+                                                    strong: ({ node, ...props }) => <strong className="font-bold text-slate-900 dark:text-white" {...props} />,
                                                     em: ({ node, ...props }) => <em className="italic" {...props} />,
                                                     code: ({ node, inline, ...props }) =>
-                                                        inline ? <code className="bg-slate-100 px-1 py-0.5 rounded text-xs" {...props} />
-                                                            : <code className="block bg-slate-100 p-2 rounded text-xs my-2" {...props} />
+                                                        inline ? <code className="bg-slate-100 dark:bg-slate-600 px-1 py-0.5 rounded text-xs" {...props} />
+                                                            : <code className="block bg-slate-100 dark:bg-slate-600 p-2 rounded text-xs my-2" {...props} />
                                                 }}
                                             >
                                                 {msg.content}
@@ -455,20 +535,20 @@ const AIChat = ({ isOpen, onClose }) => {
                         ))}
                         {isLoading && (
                             <div className="flex justify-start">
-                                <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-2">
-                                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                                    <span className="text-xs text-slate-500">Thinking...</span>
+                                <div className="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 p-3 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-2">
+                                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">Thinking...</span>
                                 </div>
                             </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="p-4 bg-white border-t border-slate-100 rounded-b-2xl">
+                    <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 rounded-b-2xl">
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={startListening}
-                                className={`p-2 rounded-xl transition-all ${isListening ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                className={`p-2 rounded-xl transition-all ${isListening ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 animate-pulse' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                                 title={isListening ? "Click to stop recording" : "Click to speak"}
                             >
                                 <Mic className="w-5 h-5" />
@@ -479,12 +559,12 @@ const AIChat = ({ isOpen, onClose }) => {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                                 placeholder="Ask AI to do something..."
-                                className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-600/20 outline-none text-sm"
+                                className="flex-1 bg-slate-50 dark:bg-slate-800 dark:text-white border-none rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/20 outline-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             />
                             <button
                                 onClick={handleSend}
                                 disabled={!input.trim() || isLoading}
-                                className="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="p-2 bg-primary text-white rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <Send className="w-5 h-5" />
                             </button>

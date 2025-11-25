@@ -47,10 +47,10 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     return (
         <>
             <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50" onClick={onClose} />
-            <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 z-50 animate-in fade-in zoom-in-95 duration-200">
+            <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 z-50 animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-800">Edit Profile</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">Edit Profile</h2>
+                    <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-400" />
                     </button>
                 </div>
@@ -59,7 +59,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                     {/* Avatar Preview */}
                     <div className="flex flex-col items-center gap-4">
                         <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                            <div className="w-24 h-24 rounded-full border-4 border-slate-50 overflow-hidden shadow-lg relative">
+                            <div className="w-24 h-24 rounded-full border-4 border-slate-50 dark:border-slate-800 overflow-hidden shadow-lg relative">
                                 <img
                                     src={formData.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
                                     alt="Avatar"
@@ -87,12 +87,12 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
                             <input
                                 type="text"
                                 value={formData.full_name}
                                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white"
                                 placeholder="John Doe"
                             />
                         </div>
@@ -102,7 +102,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-medium transition-colors"
+                            className="flex-1 py-2.5 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl font-medium transition-colors"
                         >
                             Cancel
                         </button>

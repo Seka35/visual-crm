@@ -31,8 +31,8 @@ const KPICard = ({ title, value, change, icon: Icon, color, trend, path }) => {
                 </span>
             </div>
 
-            <h3 className="text-slate-500 text-sm font-medium mb-1">{title}</h3>
-            <p className="text-2xl font-bold text-slate-800">{value}</p>
+            <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</h3>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">{value}</p>
         </div>
     );
 };
@@ -46,7 +46,7 @@ const KPICards = ({ revenue = 0, activeDeals = 0, pendingTasks = 0, meetingsToda
             icon: TrendingUp,
             color: "primary",
             trend: 12.5,
-            path: '/deals'
+            path: '/reports'
         },
         {
             title: "Active Deals",

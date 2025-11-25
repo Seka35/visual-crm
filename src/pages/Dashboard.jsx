@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable';
+import { useNavigate } from 'react-router-dom';
 import WelcomeCard from '../components/dashboard/WelcomeCard';
 import KPICards from '../components/dashboard/KPICards';
 import PipelineWidget from '../components/dashboard/PipelineWidget';
@@ -11,6 +12,7 @@ import { useCRM } from '../context/CRMContext';
 
 const Dashboard = () => {
     const { user, deals, tasks, events } = useCRM();
+    const navigate = useNavigate();
     const [funMode, setFunMode] = useState(false);
 
     // Initial widget order
@@ -18,7 +20,6 @@ const Dashboard = () => {
         'welcome',
         'kpi',
         'pipeline',
-        'activity',
         'schedule'
     ]);
 
@@ -94,43 +95,16 @@ const Dashboard = () => {
                 />;
             case 'pipeline':
                 return <PipelineWidget deals={deals} />;
-            case 'activity':
-                return (
-                    <div className="glass-card p-6 rounded-2xl h-full">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                <GripVertical className="w-4 h-4 text-slate-400 cursor-grab" />
-                                Recent Activity
-                            </h3>
-                            <button className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-primary transition-colors">
-                                <ArrowRight className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <div className="space-y-6">
-                            {/* Placeholder for activity log - could be real later */}
-                            {[1, 2, 3].map((_, i) => (
-                                <div key={i} className="flex gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                                        <Clock className="w-5 h-5 text-blue-500" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-slate-800">New lead acquired</p>
-                                        <p className="text-xs text-slate-500">2 hours ago</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                );
+
             case 'schedule':
                 return (
-                    <div className="glass-card p-6 rounded-2xl h-full">
+                    <div className="glass-card p-6 rounded-2xl h-full cursor-pointer hover:-translate-y-1 transition-transform duration-300" onClick={() => navigate('/calendar')}>
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                                 <GripVertical className="w-4 h-4 text-slate-400 cursor-grab" />
                                 Today's Schedule
                             </h3>
-                            <button className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-primary transition-colors">
+                            <button className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-400 hover:text-primary transition-colors" onClick={(e) => e.stopPropagation()}>
                                 <Calendar className="w-5 h-5" />
                             </button>
                         </div>
@@ -138,8 +112,8 @@ const Dashboard = () => {
                             {todaysEvents.length > 0 ? (
                                 todaysEvents.map(event => (
                                     <div key={event.id} className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                                        <p className="font-bold text-slate-800 text-sm">{event.title}</p>
-                                        <p className="text-xs text-slate-500 mt-1">{event.time}</p>
+                                        <p className="font-bold text-slate-800 dark:text-white text-sm">{event.title}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{event.time}</p>
                                     </div>
                                 ))
                             ) : (
@@ -158,7 +132,7 @@ const Dashboard = () => {
             case 'welcome': return 'col-span-1 md:col-span-2 lg:col-span-4';
             case 'kpi': return 'col-span-1 md:col-span-2 lg:col-span-4';
             case 'pipeline': return 'col-span-1 md:col-span-2 lg:col-span-3';
-            case 'activity': return 'col-span-1 md:col-span-1 lg:col-span-1';
+
             case 'schedule': return 'col-span-1 md:col-span-1 lg:col-span-1';
             default: return 'col-span-1';
         }
@@ -166,42 +140,23 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* View Toggle */}
-            <div className="flex justify-end">
-                <button
-                    onClick={() => setFunMode(!funMode)}
-                    className={`
-                        px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-all duration-300 shadow-lg
-                        ${funMode
-                            ? 'bg-gradient-to-r from-pink-500 to-yellow-500 text-white scale-110 rotate-1'
-                            : 'bg-white text-slate-500 hover:bg-slate-50'
-                        }
-                    `}
-                >
-                    <Sparkles className={`w-5 h-5 ${funMode ? 'animate-spin-slow' : ''}`} />
-                    <span>{funMode ? 'Fun Mode Active!' : 'Switch to Fun Mode'}</span>
-                </button>
-            </div>
 
-            {funMode ? (
-                <FunDashboard />
-            ) : (
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
-                    <SortableContext items={items} strategy={rectSortingStrategy}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {items.map((id) => (
-                                <SortableItem key={id} id={id} className={getItemClass(id)}>
-                                    {renderWidget(id)}
-                                </SortableItem>
-                            ))}
-                        </div>
-                    </SortableContext>
-                </DndContext>
-            )}
+
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+                <SortableContext items={items} strategy={rectSortingStrategy}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {items.map((id) => (
+                            <SortableItem key={id} id={id} className={getItemClass(id)}>
+                                {renderWidget(id)}
+                            </SortableItem>
+                        ))}
+                    </div>
+                </SortableContext>
+            </DndContext>
         </div>
     );
 };

@@ -65,44 +65,44 @@ const WorkflowManager = () => {
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <div className="p-6 border-b border-slate-100">
-                <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <Share2 className="w-6 h-6 text-blue-600" />
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <Share2 className="w-6 h-6 text-primary" />
                     Shared Workflows
                 </h2>
-                <p className="text-slate-500 mt-1">Manage your shared workspaces and collaborate with your team.</p>
+                <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your shared workspaces and collaborate with your team.</p>
             </div>
 
-            <div className="flex border-b border-slate-100">
+            <div className="flex border-b border-slate-100 dark:border-slate-800">
                 <button
                     onClick={() => setActiveTab('list')}
-                    className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'list' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'
+                    className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'list' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
                     My Workflows
                     {activeTab === 'list' && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
                 </button>
                 <button
                     onClick={() => setActiveTab('create')}
-                    className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'create' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'
+                    className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'create' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
                     Create New
                     {activeTab === 'create' && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
                 </button>
                 <button
                     onClick={() => setActiveTab('join')}
-                    className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'join' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'
+                    className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'join' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
                     Join Existing
                     {activeTab === 'join' && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
                 </button>
             </div>
@@ -124,21 +124,21 @@ const WorkflowManager = () => {
                         <div
                             onClick={() => switchWorkflow(null)}
                             className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${!currentWorkflow
-                                    ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600'
-                                    : 'border-slate-200 hover:border-blue-600/50'
+                                ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
                                 }`}
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
                                     <Users className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-slate-800">Personal Workspace</h3>
+                                    <h3 className="font-bold text-slate-800 dark:text-white">Personal Workspace</h3>
                                     <p className="text-xs text-slate-500">Private to you</p>
                                 </div>
                             </div>
                             {!currentWorkflow && (
-                                <div className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
+                                <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
                                     Active
                                 </div>
                             )}
@@ -149,19 +149,19 @@ const WorkflowManager = () => {
                                 key={workflow.id}
                                 onClick={() => switchWorkflow(workflow)}
                                 className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${currentWorkflow?.id === workflow.id
-                                        ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600'
-                                        : 'border-slate-200 hover:border-blue-600/50'
+                                    ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                                         <Share2 className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-slate-800">{workflow.name}</h3>
+                                        <h3 className="font-bold text-slate-800 dark:text-white">{workflow.name}</h3>
                                         <div className="flex items-center gap-2 mt-1">
                                             <p className="text-xs text-slate-500">Code: </p>
-                                            <code className="px-1.5 py-0.5 bg-slate-100 rounded text-xs font-mono text-slate-600">
+                                            <code className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-xs font-mono text-slate-600 dark:text-slate-300">
                                                 {workflow.share_code}
                                             </code>
                                             <button
@@ -169,7 +169,7 @@ const WorkflowManager = () => {
                                                     e.stopPropagation();
                                                     copyToClipboard(workflow.share_code, workflow.id);
                                                 }}
-                                                className="text-slate-400 hover:text-blue-600 transition-colors"
+                                                className="text-slate-400 hover:text-primary transition-colors"
                                             >
                                                 {copiedId === workflow.id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                                             </button>
@@ -177,7 +177,7 @@ const WorkflowManager = () => {
                                     </div>
                                 </div>
                                 {currentWorkflow?.id === workflow.id && (
-                                    <div className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
+                                    <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
                                         Active
                                     </div>
                                 )}
@@ -189,18 +189,18 @@ const WorkflowManager = () => {
                 {activeTab === 'create' && (
                     <form onSubmit={handleCreate} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Workflow Name</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Workflow Name</label>
                             <input
                                 type="text"
                                 value={newWorkflowName}
                                 onChange={(e) => setNewWorkflowName(e.target.value)}
                                 placeholder="e.g., Sales Team A"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all"
+                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white"
                                 required
                             />
                         </div>
-                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <h4 className="text-sm font-bold text-slate-700 mb-2">Shared Resources</h4>
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Shared Resources</h4>
                             <p className="text-xs text-slate-500 mb-3">Select what members can access:</p>
                             <div className="flex flex-wrap gap-2">
                                 {['Contacts', 'Deals', 'Tasks', 'Calendar'].map(resource => {
@@ -212,8 +212,8 @@ const WorkflowManager = () => {
                                             type="button"
                                             onClick={() => toggleResource(resource)}
                                             className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${isSelected
-                                                    ? 'bg-blue-600 text-white border-blue-600'
-                                                    : 'bg-white text-slate-600 border-slate-200 hover:border-blue-600/50'
+                                                ? 'bg-primary text-white border-primary'
+                                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-primary/50'
                                                 }`}
                                         >
                                             {resource}
@@ -224,7 +224,7 @@ const WorkflowManager = () => {
                         </div>
                         <button
                             type="submit"
-                            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                         >
                             <Plus className="w-5 h-5" />
                             Create Workflow
@@ -235,13 +235,13 @@ const WorkflowManager = () => {
                 {activeTab === 'join' && (
                     <form onSubmit={handleJoin} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Workflow Code</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Workflow Code</label>
                             <input
                                 type="text"
                                 value={joinCode}
                                 onChange={(e) => setJoinCode(e.target.value)}
                                 placeholder="Enter 6-character code"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all font-mono uppercase"
+                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono uppercase dark:text-white"
                                 maxLength={6}
                                 required
                             />

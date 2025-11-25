@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 
 import { CRMProvider, useCRM } from './context/CRMContext';
 import { WorkflowProvider } from './context/WorkflowContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -89,11 +90,13 @@ function AppRoutes() {
 function App() {
     return (
         <WorkflowProvider>
-            <CRMProvider>
-                <BrowserRouter>
-                    <AppRoutes />
-                </BrowserRouter>
-            </CRMProvider>
+            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+                <CRMProvider>
+                    <BrowserRouter>
+                        <AppRoutes />
+                    </BrowserRouter>
+                </CRMProvider>
+            </ThemeProvider>
         </WorkflowProvider>
     );
 }

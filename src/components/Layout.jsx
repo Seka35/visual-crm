@@ -15,7 +15,7 @@ const Layout = () => {
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen bg-background flex transition-colors duration-300">
             {/* Desktop Sidebar - Hidden on Mobile */}
             <div className="hidden md:block">
                 <Sidebar
@@ -34,7 +34,7 @@ const Layout = () => {
                 `}
             >
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none fixed" />
-                <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-primary/5 to-transparent dark:from-slate-900/50 pointer-events-none" />
 
                 <Header onMenuClick={toggleMobileMenu} />
 

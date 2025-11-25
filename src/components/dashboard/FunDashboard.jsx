@@ -49,12 +49,12 @@ const FunDashboard = () => {
                 {/* Tasks Rocket */}
                 <motion.div
                     whileHover={{ scale: 1.05, rotate: -2 }}
-                    className="bg-blue-200 rounded-3xl p-6 border-4 border-white shadow-lg"
+                    className="bg-primary/20 rounded-3xl p-6 border-4 border-white shadow-lg"
                 >
                     <div className="text-6xl mb-4">🚀</div>
-                    <h3 className="text-2xl font-black text-blue-600 mb-1">Missions</h3>
+                    <h3 className="text-2xl font-black text-primary mb-1">Missions</h3>
                     <p className="text-4xl font-black text-white drop-shadow-sm">8 Done</p>
-                    <p className="text-blue-600 font-bold text-lg mt-4">Zoom zoom!</p>
+                    <p className="text-primary font-bold text-lg mt-4">Zoom zoom!</p>
                 </motion.div>
 
                 {/* Happy Clients */}
@@ -89,7 +89,7 @@ const FunDashboard = () => {
                             <span>Finish Line</span>
                         </div>
                         <div className="h-12 bg-slate-100 rounded-full w-full relative overflow-hidden border-2 border-slate-200">
-                            <div className="absolute top-0 bottom-0 left-0 w-[20%] bg-blue-400 rounded-full opacity-30" />
+                            <div className="absolute top-0 bottom-0 left-0 w-[20%] bg-primary rounded-full opacity-30" />
                             <div className="absolute top-0 bottom-0 left-[20%] w-[20%] bg-indigo-400 rounded-full opacity-30" />
                             <div className="absolute top-0 bottom-0 left-[40%] w-[20%] bg-purple-400 rounded-full opacity-30" />
                             <div className="absolute top-0 bottom-0 left-[60%] w-[20%] bg-pink-400 rounded-full opacity-30" />

@@ -40,8 +40,8 @@ const ContactList = ({ contacts }) => {
                                 <div className="flex gap-2">
                                     {contact.tags.map((tag, i) => (
                                         <span key={i} className={`text-[10px] font-bold px-2 py-1 rounded-lg ${tag === 'VIP' ? 'bg-purple-100 text-purple-600' :
-                                                tag === 'New' ? 'bg-blue-100 text-blue-600' :
-                                                    'bg-slate-100 text-slate-500'
+                                            tag === 'New' ? 'bg-primary/10 text-primary' :
+                                                'bg-slate-100 text-slate-500'
                                             }`}>
                                             {tag}
                                         </span>

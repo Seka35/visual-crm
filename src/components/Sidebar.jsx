@@ -3,7 +3,12 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Briefcase, CheckSquare, BarChart2, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 
+import { useTheme } from '../context/ThemeContext';
+import logoWhite from '../assets/logo_white.png';
+import logoBlack from '../assets/logo_black.png';
+
 const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => {
+    const { theme } = useTheme();
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
         { icon: Users, label: 'Contacts', path: '/contacts' },
@@ -26,27 +31,20 @@ const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => 
             {/* Sidebar */}
             <aside
                 className={cn(
-                    "fixed left-0 top-0 h-screen glass-dark flex flex-col z-50 transition-all duration-300",
+                    "fixed left-0 top-0 h-screen bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/50 flex flex-col z-50 transition-all duration-300",
                     isCollapsed ? "w-20" : "w-64",
                     // Mobile: slide in/out
                     isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
                 )}
             >
-                <div className={cn("p-6 flex items-center gap-3", isCollapsed && "justify-center px-2")}>
-                    <div className="w-8 h-8 min-w-[2rem] bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/30">
-                        <span className="text-white font-bold text-xl">V</span>
+                <div className={cn("p-6 flex items-center justify-center", isCollapsed && "px-2")}>
+                    <div className={cn("transition-all duration-300 flex items-center justify-center", isCollapsed ? "w-10 h-10" : "w-64 h-64 -my-10")}>
+                        <img src={theme === 'dark' ? logoWhite : logoBlack} alt="Visual CRM" className="w-full h-full object-contain" />
                     </div>
-                    {!isCollapsed && (
-                        <div className="flex-1 flex justify-between items-center">
-                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 whitespace-nowrap">
-                                Visual CRM
-                            </h1>
-                            {/* Mobile Close Button */}
-                            <button onClick={closeMobile} className="md:hidden text-slate-400 hover:text-white">
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-                    )}
+                    {/* Mobile Close Button */}
+                    <button onClick={closeMobile} className="md:hidden absolute top-4 right-4 text-slate-400 hover:text-white">
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
 
                 <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto overflow-x-hidden">

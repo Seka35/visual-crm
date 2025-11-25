@@ -18,7 +18,7 @@ const MobileNav = ({ onOpenAI }) => {
     const rightItems = navItems.slice(3);
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around px-4 z-[9999] md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div className="fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around px-4 z-[9999] md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
             {leftItems.map((item) => (
                 <NavLink
                     key={item.path}
@@ -26,7 +26,7 @@ const MobileNav = ({ onOpenAI }) => {
                     className={({ isActive }) =>
                         cn(
                             "flex flex-col items-center justify-center w-12 h-full gap-1 transition-colors",
-                            isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"
+                            isActive ? "text-primary" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                         )
                     }
                 >
@@ -39,7 +39,7 @@ const MobileNav = ({ onOpenAI }) => {
             <div className="relative -top-6">
                 <button
                     onClick={onOpenAI}
-                    className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:scale-110 transition-transform ring-4 ring-slate-50"
+                    className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:scale-110 transition-transform ring-4 ring-slate-50 dark:ring-slate-900"
                 >
                     <Sparkles className="w-6 h-6 animate-pulse" />
                 </button>
@@ -52,7 +52,7 @@ const MobileNav = ({ onOpenAI }) => {
                     className={({ isActive }) =>
                         cn(
                             "flex flex-col items-center justify-center w-12 h-full gap-1 transition-colors",
-                            isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"
+                            isActive ? "text-primary" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                         )
                     }
                 >
