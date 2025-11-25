@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'BrushPoint';
+  src: url('./assets/brush-point.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@layer utilities {
+  .font-gta {
+    font-family: 'StopLost', sans-serif;
+    letter-spacing: 0.05em;
+  }
+}
+
+@font-face {
+  font-family: 'StopLost';
+  src: url('./assets/Stop Lost.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -77,7 +98,13 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', sans-serif;
+    font-family: 'StopLost', sans-serif;
+    font-size: 1.5rem;
+    /* Increased base font size */
+    letter-spacing: 0.05em;
+    /* Added letter spacing for readability */
+    line-height: 1.6;
+    /* Improved line height */
   }
 }
 

@@ -213,10 +213,10 @@ const Header = ({ onMenuClick }) => {
                                     <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                                         <button
                                             onClick={handleSignOut}
-                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-danger hover:bg-danger/5 transition-colors"
+                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-colors font-gta tracking-wide"
                                         >
                                             <LogOut className="w-4 h-4" />
-                                            <span>Sign Out</span>
+                                            <span className="text-lg">Sign Out</span>
                                         </button>
                                     </div>
                                 </div>

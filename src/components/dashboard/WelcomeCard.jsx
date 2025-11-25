@@ -18,8 +18,8 @@ const WelcomeCard = ({ user, tasks = [], events = [] }) => {
 
             <div className="relative z-10">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-1">
-                        {greeting}, {user?.user_metadata?.full_name?.split(' ')[0] || 'User'}! 👋
+                    <h2 className="text-5xl font-bold font-gta text-slate-800 dark:text-white mb-2 tracking-wide">
+                        {greeting}, {user?.user_metadata?.full_name?.split(' ')[0] || 'User'}
                     </h2>
                     <p className="text-slate-500 dark:text-slate-400 mb-4">
                         You have {pendingTasks} tasks pending and {todaysMeetings} meetings today.
