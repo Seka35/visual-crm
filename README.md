@@ -1,6 +1,6 @@
 # 🚀 Visual Auto CRM - Next Gen Relationship Management
 
-![Visual Auto CRM Banner](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/dfc92c3e-3e6f-428b-af38-3236e89dd460-0.7714016002439011.png)
+![Visual Auto CRM Banner]([https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/dfc92c3e-3e6f-428b-af38-3236e89dd460-0.7714016002439011.png](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/baniere.png))
 
 **Visual Auto CRM** is a modern, high-performance Customer Relationship Management application built for speed, aesthetics, and efficiency. It features a stunning **Glassmorphism UI**, a fully integrated **Dark Mode**, and a unique AI Assistant with a... *colorful* personality.
 
