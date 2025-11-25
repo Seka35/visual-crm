@@ -9,6 +9,9 @@ import WorkflowSettingsModal from './WorkflowSettingsModal';
 
 import { useTheme } from '../context/ThemeContext';
 
+import logoWhite from '../assets/logo_white.png';
+import logoBlack from '../assets/logo_black.png';
+
 const Header = ({ onMenuClick }) => {
     const { user, signOut } = useCRM();
     const { currentWorkflow, workflows, switchWorkflow, notifications } = useWorkflow();
@@ -39,6 +42,11 @@ const Header = ({ onMenuClick }) => {
         <>
             <header className="h-20 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40 glass mb-8 rounded-b-2xl mx-4 mt-2">
                 <div className="flex items-center gap-4 flex-1 max-w-xl">
+                    {/* Mobile Logo */}
+                    <div className="sm:hidden w-8 h-8 flex-shrink-0">
+                        <img src={theme === 'dark' ? logoWhite : logoBlack} alt="Logo" className="w-full h-full object-contain" />
+                    </div>
+
                     <div className="relative w-full group hidden sm:block">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                         <input

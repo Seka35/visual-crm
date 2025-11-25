@@ -53,7 +53,7 @@ const Layout = () => {
             {!isAIChatOpen && (
                 <button
                     onClick={() => setIsAIChatOpen(true)}
-                    className="hidden md:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg shadow-blue-600/30 items-center justify-center text-white hover:scale-110 transition-transform z-50 group"
+                    className="hidden md:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full shadow-lg shadow-orange-500/30 items-center justify-center text-white hover:scale-110 transition-transform z-50 group"
                 >
                     <Sparkles className="w-6 h-6 group-hover:animate-pulse" />
                 </button>

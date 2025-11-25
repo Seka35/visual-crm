@@ -39,7 +39,7 @@ const MobileNav = ({ onOpenAI }) => {
             <div className="relative -top-6">
                 <button
                     onClick={onOpenAI}
-                    className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:scale-110 transition-transform ring-4 ring-slate-50 dark:ring-slate-900"
+                    className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full shadow-lg shadow-orange-500/30 flex items-center justify-center text-white hover:scale-110 transition-transform ring-4 ring-slate-50 dark:ring-slate-900"
                 >
                     <Sparkles className="w-6 h-6 animate-pulse" />
                 </button>
