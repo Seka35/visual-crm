@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useWorkflow } from '../context/WorkflowContext';
-import { Plus, Users, Copy, Check, ArrowRight, Share2 } from 'lucide-react';
+import { Plus, Users, Copy, Check, ArrowRight, Share2, Settings } from 'lucide-react';
+import WorkflowSettingsModal from './WorkflowSettingsModal';
 
 const WorkflowManager = () => {
     const { workflows, createWorkflow, joinWorkflow, currentWorkflow, switchWorkflow } = useWorkflow();
@@ -11,6 +12,7 @@ const WorkflowManager = () => {
     const [copiedId, setCopiedId] = useState(null);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [settingsWorkflow, setSettingsWorkflow] = useState(null);
 
     const toggleResource = (resource) => {
         const id = resource.toLowerCase();
@@ -176,11 +178,22 @@ const WorkflowManager = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {currentWorkflow?.id === workflow.id && (
-                                    <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
-                                        Active
-                                    </div>
-                                )}
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSettingsWorkflow(workflow);
+                                        }}
+                                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-primary transition-colors"
+                                    >
+                                        <Settings className="w-4 h-4" />
+                                    </button>
+                                    {currentWorkflow?.id === workflow.id && (
+                                        <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
+                                            Active
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -256,6 +269,14 @@ const WorkflowManager = () => {
                     </form>
                 )}
             </div>
+
+            {settingsWorkflow && (
+                <WorkflowSettingsModal
+                    isOpen={!!settingsWorkflow}
+                    onClose={() => setSettingsWorkflow(null)}
+                    workflow={settingsWorkflow}
+                />
+            )}
         </div>
     );
 };

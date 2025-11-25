@@ -199,12 +199,24 @@ const Header = ({ onMenuClick }) => {
                                             <Share2 className="w-4 h-4" />
                                             <span>Workflows</span>
                                         </button>
-                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors">
+                                        <button
+                                            onClick={() => {
+                                                navigate('/profile?tab=settings');
+                                                setIsProfileOpen(false);
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
+                                        >
                                             <Settings className="w-4 h-4" />
                                             <span>Account Settings</span>
                                         </button>
 
-                                        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors">
+                                        <button
+                                            onClick={() => {
+                                                navigate('/profile?tab=support');
+                                                setIsProfileOpen(false);
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
+                                        >
                                             <HelpCircle className="w-4 h-4" />
                                             <span>Help & Support</span>
                                         </button>

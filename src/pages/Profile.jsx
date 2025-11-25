@@ -4,6 +4,8 @@ import { useCRM } from '../context/CRMContext';
 import { useSearchParams } from 'react-router-dom';
 import WorkflowManager from '../components/WorkflowManager';
 import EditProfileModal from '../components/EditProfileModal';
+import AccountSettings from './AccountSettings';
+import HelpSupport from './HelpSupport';
 
 const Profile = () => {
     const { user } = useCRM();
@@ -44,10 +46,10 @@ const Profile = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-slate-200">
+            <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
                 <button
                     onClick={() => handleTabChange('profile')}
-                    className={`px-6 py-3 text-sm font-medium transition-colors relative ${activeTab === 'profile' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                    className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'profile' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
                     Profile Details
@@ -57,11 +59,31 @@ const Profile = () => {
                 </button>
                 <button
                     onClick={() => handleTabChange('workflows')}
-                    className={`px-6 py-3 text-sm font-medium transition-colors relative ${activeTab === 'workflows' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                    className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'workflows' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
                     Workflows
                     {activeTab === 'workflows' && (
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+                    )}
+                </button>
+                <button
+                    onClick={() => handleTabChange('settings')}
+                    className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'settings' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                        }`}
+                >
+                    Account Settings
+                    {activeTab === 'settings' && (
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+                    )}
+                </button>
+                <button
+                    onClick={() => handleTabChange('support')}
+                    className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'support' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                        }`}
+                >
+                    Help & Support
+                    {activeTab === 'support' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
                 </button>
@@ -170,6 +192,14 @@ const Profile = () => {
 
             {activeTab === 'workflows' && (
                 <WorkflowManager />
+            )}
+
+            {activeTab === 'settings' && (
+                <AccountSettings />
+            )}
+
+            {activeTab === 'support' && (
+                <HelpSupport />
             )}
 
             <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
