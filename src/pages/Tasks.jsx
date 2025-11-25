@@ -26,8 +26,8 @@ const Tasks = () => {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">My Tasks</h2>
-                    <p className="text-slate-500 dark:text-slate-400">Stay organized and productive</p>
+                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">MISSIONS</h2>
+                    <p className="text-slate-500 dark:text-slate-400">Get it done. No excuses.</p>
                 </div>
 
                 <button
@@ -35,7 +35,7 @@ const Tasks = () => {
                     className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95 w-full md:w-auto"
                 >
                     <Plus className="w-5 h-5" />
-                    <span>New Task</span>
+                    <span>New Mission</span>
                 </button>
             </div>
 
@@ -43,7 +43,7 @@ const Tasks = () => {
                 <div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-warning" />
-                        To Do ({pendingTasks.length})
+                        Active Missions ({pendingTasks.length})
                     </h3>
                     <div className="space-y-3">
                         {pendingTasks.map(task => (
@@ -53,7 +53,7 @@ const Tasks = () => {
                         ))}
                         {pendingTasks.length === 0 && (
                             <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-                                <p className="text-slate-400 font-medium">No pending tasks! 🎉</p>
+                                <p className="text-slate-400 font-medium">No active missions! 🎉</p>
                             </div>
                         )}
                     </div>
@@ -63,7 +63,7 @@ const Tasks = () => {
                     <div>
                         <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2 opacity-60">
                             <CheckCircle className="w-4 h-4" />
-                            Completed ({completedTasks.length})
+                            Mission Accomplished ({completedTasks.length})
                         </h3>
                         <div className="space-y-3">
                             {completedTasks.map(task => (

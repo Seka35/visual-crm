@@ -69,11 +69,11 @@ const WorkflowManager = () => {
     return (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
             <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2 font-gta tracking-wide">
                     <Share2 className="w-6 h-6 text-primary" />
-                    Shared Workflows
+                    OPERATIONS
                 </h2>
-                <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your shared workspaces and collaborate with your team.</p>
+                <p className="text-slate-500 dark:text-slate-400 mt-1">Automate the hustle.</p>
             </div>
 
             <div className="flex border-b border-slate-100 dark:border-slate-800">
@@ -82,7 +82,7 @@ const WorkflowManager = () => {
                     className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'list' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    My Workflows
+                    My Operations
                     {activeTab === 'list' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -92,7 +92,7 @@ const WorkflowManager = () => {
                     className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'create' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    Create New
+                    New Scheme
                     {activeTab === 'create' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -102,7 +102,7 @@ const WorkflowManager = () => {
                     className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab === 'join' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    Join Existing
+                    Join Crew
                     {activeTab === 'join' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -135,13 +135,13 @@ const WorkflowManager = () => {
                                     <Users className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-slate-800 dark:text-white">Personal Workspace</h3>
+                                    <h3 className="font-bold text-slate-800 dark:text-white">MY TURF</h3>
                                     <p className="text-xs text-slate-500">Private to you</p>
                                 </div>
                             </div>
                             {!currentWorkflow && (
-                                <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
-                                    Active
+                                <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-wide">
+                                    RUNNING
                                 </div>
                             )}
                         </div>
@@ -189,8 +189,8 @@ const WorkflowManager = () => {
                                         <Settings className="w-4 h-4" />
                                     </button>
                                     {currentWorkflow?.id === workflow.id && (
-                                        <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
-                                            Active
+                                        <div className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-wide">
+                                            RUNNING
                                         </div>
                                     )}
                                 </div>
@@ -202,19 +202,19 @@ const WorkflowManager = () => {
                 {activeTab === 'create' && (
                     <form onSubmit={handleCreate} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Workflow Name</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Scheme Name</label>
                             <input
                                 type="text"
                                 value={newWorkflowName}
                                 onChange={(e) => setNewWorkflowName(e.target.value)}
-                                placeholder="e.g., Sales Team A"
+                                placeholder="e.g., The Big Score"
                                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white"
                                 required
                             />
                         </div>
                         <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
                             <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Shared Resources</h4>
-                            <p className="text-xs text-slate-500 mb-3">Select what members can access:</p>
+                            <p className="text-xs text-slate-500 mb-3">Select what the crew can access:</p>
                             <div className="flex flex-wrap gap-2">
                                 {['Contacts', 'Deals', 'Tasks', 'Calendar'].map(resource => {
                                     const id = resource.toLowerCase();
@@ -237,10 +237,10 @@ const WorkflowManager = () => {
                         </div>
                         <button
                             type="submit"
-                            className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 uppercase tracking-wide"
                         >
                             <Plus className="w-5 h-5" />
-                            Create Workflow
+                            Start New Scheme
                         </button>
                     </form>
                 )}

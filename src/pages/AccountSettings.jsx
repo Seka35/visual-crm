@@ -62,8 +62,8 @@ const AccountSettings = () => {
                         <User className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">Profile Information</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Update your personal details</p>
+                        <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">SYSTEM CONFIG</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Tweak the system.</p>
                     </div>
                 </div>
 
@@ -89,10 +89,10 @@ const AccountSettings = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 uppercase tracking-wide"
                     >
                         <Save className="w-5 h-5" />
-                        <span>Save Changes</span>
+                        <span>CONFIRM CHANGES</span>
                     </button>
                 </form>
             </div>
@@ -131,7 +131,7 @@ const AccountSettings = () => {
                     <button
                         type="submit"
                         disabled={loading || !password}
-                        className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors disabled:opacity-50 uppercase tracking-wide"
                     >
                         <Lock className="w-5 h-5" />
                         <span>Update Password</span>
@@ -146,7 +146,7 @@ const AccountSettings = () => {
                         <Trash2 className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold font-gta text-red-500 tracking-wide">Danger Zone</h3>
+                        <h3 className="text-xl font-bold font-gta text-red-500 tracking-wide">BURN IT DOWN</h3>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">Irreversible actions</p>
                     </div>
                 </div>
@@ -156,8 +156,8 @@ const AccountSettings = () => {
                         <h4 className="font-bold text-slate-800 dark:text-white text-lg">Delete Account</h4>
                         <p className="text-slate-500 dark:text-slate-400">Permanently remove your account and all data</p>
                     </div>
-                    <button className="px-6 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors">
-                        Delete Account
+                    <button className="px-6 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors uppercase tracking-wide">
+                        BURN IT DOWN
                     </button>
                 </div>
             </div>

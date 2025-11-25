@@ -41,8 +41,8 @@ const Contacts = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">Contacts</h2>
-                    <p className="text-slate-500 dark:text-slate-400">Manage your relationships and leads</p>
+                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">THE CREW</h2>
+                    <p className="text-slate-500 dark:text-slate-400">Keep your friends close and your enemies closer.</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -51,7 +51,7 @@ const Contacts = () => {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Search contacts..."
+                                placeholder="Search associates..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm w-full sm:w-64 dark:text-white"
@@ -83,7 +83,7 @@ const Contacts = () => {
                         className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
                     >
                         <Plus className="w-5 h-5" />
-                        <span>Add Contact</span>
+                        <span>Add Associate</span>
                     </button>
                 </div>
             </div>

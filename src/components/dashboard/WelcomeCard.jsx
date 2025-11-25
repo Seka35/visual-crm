@@ -3,7 +3,7 @@ import { Sun, Cloud, CloudRain } from 'lucide-react';
 
 const WelcomeCard = ({ user, tasks = [], events = [] }) => {
     const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const greeting = hour < 12 ? 'Rise & Grind' : hour < 18 ? "Keep Hustlin'" : 'Night Moves';
 
     const pendingTasks = tasks.filter(t => !t.completed).length;
     const today = new Date().toISOString().split('T')[0];
@@ -18,15 +18,15 @@ const WelcomeCard = ({ user, tasks = [], events = [] }) => {
 
             <div className="relative z-10">
                 <div>
-                    <h2 className="text-5xl font-bold font-gta text-slate-800 dark:text-white mb-2 tracking-wide">
-                        {greeting}, {user?.user_metadata?.full_name?.split(' ')[0] || 'User'}
+                    <h2 className="text-5xl font-bold font-gta text-slate-800 dark:text-white mb-2 tracking-wide uppercase">
+                        {greeting}, {user?.user_metadata?.full_name?.split(' ')[0] || 'Boss'}
                     </h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-4">
-                        You have {pendingTasks} tasks pending and {todaysMeetings} meetings today.
+                    <p className="text-slate-500 dark:text-slate-400 mb-4 font-medium">
+                        You got {pendingTasks} loose ends and {todaysMeetings} sit downs on the docket.
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-lg w-fit">
+                    <div className="flex items-center gap-2 text-sm font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wider">
                         <Sun className="w-4 h-4" />
-                        <span>Sales Forecast: Sunny</span>
+                        <span>Money Forecast: Making Bank</span>
                     </div>
                 </div>
             </div>

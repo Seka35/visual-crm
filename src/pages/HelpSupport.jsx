@@ -66,8 +66,8 @@ const HelpSupport = () => {
                             <FileText className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">FAQ</h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm">Common questions</p>
+                            <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">THE CODE</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm">Rules of the game.</p>
                         </div>
                     </div>
 
@@ -98,8 +98,8 @@ const HelpSupport = () => {
                             <MessageSquare className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">Contact Support</h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm">Send us a message</p>
+                            <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">CALL THE CLEANER</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm">Send a message.</p>
                         </div>
                     </div>
 
@@ -135,14 +135,14 @@ const HelpSupport = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20 uppercase tracking-wide"
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
                                     <Send className="w-5 h-5" />
-                                    <span>Submit Ticket</span>
+                                    <span>SEND SIGNAL</span>
                                 </>
                             )}
                         </button>

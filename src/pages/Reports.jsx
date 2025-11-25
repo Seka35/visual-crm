@@ -67,8 +67,8 @@ const Reports = () => {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">Reports & Analytics</h2>
-                    <p className="text-slate-500 dark:text-slate-400">Track your performance and growth</p>
+                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">THE LEDGER</h2>
+                    <p className="text-slate-500 dark:text-slate-400">Check the numbers. Don't lie to yourself.</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">

@@ -4,35 +4,41 @@ import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase as BriefcaseIcon } from 'lucide-react';
 
-const KPICard = ({ title, value, change, icon: Icon, color, trend, path }) => {
+const KPICard = ({ title, value, icon: Icon, color, path }) => {
     const navigate = useNavigate();
 
     const colorStyles = {
         primary: "text-primary bg-primary/10 border-primary/20",
-        secondary: "text-secondary bg-secondary/10 border-secondary/20",
-        success: "text-success bg-success/10 border-success/20",
-        warning: "text-warning bg-warning/10 border-warning/20",
+        secondary: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+        success: "text-green-500 bg-green-500/10 border-green-500/20",
+        warning: "text-orange-500 bg-orange-500/10 border-orange-500/20",
+    };
+
+    const iconColorStyles = {
+        primary: "text-primary",
+        secondary: "text-blue-500",
+        success: "text-green-500",
+        warning: "text-orange-500",
     };
 
     return (
         <div
             onClick={() => path && navigate(path)}
-            className="glass-card p-5 rounded-2xl hover:-translate-y-1 transition-transform duration-300 cursor-pointer"
+            className="glass-card p-6 rounded-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden group min-h-[140px] flex items-center"
         >
-            <div className="flex justify-between items-start mb-4">
-                <div className={cn("p-3 rounded-xl", colorStyles[color])}>
-                    <Icon className="w-6 h-6" />
+            <div className="relative z-10 flex items-center justify-between w-full">
+                <div className={cn("p-4 rounded-2xl transition-colors shrink-0", colorStyles[color])}>
+                    <Icon className="w-8 h-8" />
                 </div>
-                <span className={cn(
-                    "text-xs font-bold px-2 py-1 rounded-lg",
-                    trend > 0 ? "text-success bg-success/10" : "text-danger bg-danger/10"
-                )}>
-                    {trend > 0 ? '+' : ''}{trend}%
-                </span>
+
+                <div className="flex flex-col items-end">
+                    <h3 className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider mb-1 font-gta text-right">{title}</h3>
+                    <p className="text-5xl font-bold text-slate-800 dark:text-white font-gta tracking-wide text-right -rotate-2 origin-bottom-right drop-shadow-md">{value}</p>
+                </div>
             </div>
 
-            <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</h3>
-            <p className="text-2xl font-bold text-slate-800 dark:text-white">{value}</p>
+            {/* Decorative background icon */}
+            <Icon className={cn("absolute -bottom-4 -right-4 w-32 h-32 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rotate-12", iconColorStyles[color])} />
         </div>
     );
 };
@@ -40,39 +46,31 @@ const KPICard = ({ title, value, change, icon: Icon, color, trend, path }) => {
 const KPICards = ({ revenue = 0, activeDeals = 0, pendingTasks = 0, meetingsToday = 0 }) => {
     const kpis = [
         {
-            title: "Total Revenue",
+            title: "THE STASH",
             value: `$${revenue.toLocaleString()}`,
-            change: 12.5,
             icon: TrendingUp,
             color: "primary",
-            trend: 12.5,
             path: '/reports'
         },
         {
-            title: "Active Deals",
+            title: "ACTIVE HUSTLES",
             value: activeDeals.toString(),
-            change: 5.2,
             icon: BriefcaseIcon,
             color: "secondary",
-            trend: 5.2,
             path: '/deals'
         },
         {
-            title: "Pending Tasks",
+            title: "LOOSE ENDS",
             value: pendingTasks.toString(),
-            change: -2.4,
             icon: CheckCircle,
             color: "success",
-            trend: -2.4,
             path: '/tasks'
         },
         {
-            title: "Meetings Today",
+            title: "SIT DOWNS",
             value: meetingsToday.toString(),
-            change: 0,
             icon: Calendar,
             color: "warning",
-            trend: 0,
             path: '/calendar'
         }
     ];

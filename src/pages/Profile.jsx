@@ -41,8 +41,8 @@ const Profile = () => {
     return (
         <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 p-4 sm:p-8">
             <div>
-                <h2 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">My Profile</h2>
-                <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your account settings and preferences</p>
+                <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white tracking-tight mb-4">THE BOSS</h2>
+                <p className="text-slate-500 dark:text-slate-400 mt-1">Keep your info off the grid.</p>
             </div>
 
             {/* Tabs */}
@@ -52,7 +52,7 @@ const Profile = () => {
                     className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'profile' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    Profile Details
+                    STATS
                     {activeTab === 'profile' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -62,7 +62,7 @@ const Profile = () => {
                     className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'workflows' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    Workflows
+                    OPERATIONS
                     {activeTab === 'workflows' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -72,7 +72,7 @@ const Profile = () => {
                     className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'settings' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    Account Settings
+                    SETTINGS
                     {activeTab === 'settings' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -82,7 +82,7 @@ const Profile = () => {
                     className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'support' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                 >
-                    Help & Support
+                    BACKUP
                     {activeTab === 'support' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
@@ -93,7 +93,7 @@ const Profile = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column: Identity Card */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 flex flex-col items-center text-center h-full">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 flex flex-col items-center text-center">
                             <div className="relative mb-4 group">
                                 <div className="w-32 h-32 rounded-full p-1 border-2 border-slate-100 dark:border-slate-800">
                                     <img
@@ -107,16 +107,16 @@ const Profile = () => {
                                 </button>
                             </div>
 
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{displayName}</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-100 dark:border-slate-700">
-                                CRM User
+                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1 font-gta tracking-wide">{displayName}</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-100 dark:border-slate-700 font-bold uppercase tracking-wider">
+                                KINGPIN
                             </p>
 
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
-                                className="w-full py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+                                className="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200 uppercase tracking-wide"
                             >
-                                Edit Profile
+                                CHANGE IDENTITY
                             </button>
                         </div>
                     </div>
@@ -125,9 +125,9 @@ const Profile = () => {
                     <div className="lg:col-span-2 space-y-6">
                         {/* General Info */}
                         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
-                            <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2 font-gta text-lg">
                                 <User className="w-4 h-4" />
-                                General Information
+                                INTEL
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors group">
@@ -154,9 +154,9 @@ const Profile = () => {
 
                         {/* Security & Activity */}
                         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
-                            <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2 font-gta text-lg">
                                 <Shield className="w-4 h-4" />
-                                Security & Activity
+                                HEAT LEVEL
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-green-200 transition-colors group">

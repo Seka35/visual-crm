@@ -152,8 +152,8 @@ const Deals = () => {
         <div className="h-full md:h-[calc(100vh-8rem)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">Deals Pipeline</h2>
-                    <p className="text-slate-500 dark:text-slate-400">Drag and drop deals to update their stage</p>
+                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">BIG SCORES</h2>
+                    <p className="text-slate-500 dark:text-slate-400">Plan the next big job.</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -175,7 +175,7 @@ const Deals = () => {
                         className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
                     >
                         <Plus className="w-5 h-5" />
-                        <span>New Deal</span>
+                        <span>New Heist</span>
                     </button>
                 </div>
             </div>

@@ -7,18 +7,23 @@
   font-style: normal;
 }
 
-@layer utilities {
-  .font-gta {
-    font-family: 'StopLost', sans-serif;
-    letter-spacing: 0.05em;
-  }
-}
-
 @font-face {
   font-family: 'StopLost';
   src: url('./assets/Stop Lost.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
+}
+
+@layer utilities {
+  .font-gta {
+    font-family: 'StopLost', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .font-brush {
+    font-family: 'BrushPoint', sans-serif;
+    letter-spacing: 0.05em;
+  }
 }
 
 @layer base {
@@ -91,11 +96,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('./assets/background.webp');
+    background-image: url('./assets/baniere_site_2.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.15;
+    opacity: 0.08;
     z-index: -1;
     pointer-events: none;
   }

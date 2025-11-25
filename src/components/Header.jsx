@@ -13,7 +13,7 @@ import logoWhite from '../assets/logo_white.png';
 import logoBlack from '../assets/logo_black.png';
 
 const Header = ({ onMenuClick }) => {
-    const { user, signOut } = useCRM();
+    const { user, signOut, deals } = useCRM();
     const { currentWorkflow, workflows, switchWorkflow, notifications } = useWorkflow();
     const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -37,6 +37,19 @@ const Header = ({ onMenuClick }) => {
     const userAvatar = user?.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail}`;
 
     const unreadCount = notifications.filter(n => !n.read).length;
+
+    // Calculate Total Revenue
+    const wonDeals = deals?.won?.items || [];
+    const totalRevenue = wonDeals.reduce((sum, deal) => {
+        const amountString = deal.amount || '0';
+        const amountValue = parseFloat(amountString.replace(/[^0-9.-]+/g, '')) || 0;
+        return sum + amountValue;
+    }, 0);
+    const formattedRevenue = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+    }).format(totalRevenue);
 
     return (
         <>
@@ -68,8 +81,8 @@ const Header = ({ onMenuClick }) => {
                             className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-100 dark:border-slate-700 transition-colors"
                         >
                             <Share2 className="w-4 h-4 text-primary" />
-                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 max-w-[150px] truncate">
-                                {currentWorkflow ? currentWorkflow.name : 'Personal Workspace'}
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200 max-w-[150px] truncate uppercase font-gta tracking-wide">
+                                {currentWorkflow ? currentWorkflow.name : 'MY TURF'}
                             </span>
                             <ChevronDown className="w-3 h-3 text-slate-400" />
                         </button>
@@ -79,7 +92,7 @@ const Header = ({ onMenuClick }) => {
                                 <div className="fixed inset-0 z-40" onClick={() => setIsWorkflowOpen(false)} />
                                 <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                     <div className="p-2">
-                                        <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider px-2">Switch Workspace</p>
+                                        <p className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider px-2">CHANGE TURF</p>
                                         <button
                                             onClick={() => {
                                                 switchWorkflow(null);
@@ -87,7 +100,7 @@ const Header = ({ onMenuClick }) => {
                                             }}
                                             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                         >
-                                            <span className={!currentWorkflow ? 'font-bold text-primary' : 'text-slate-600 dark:text-slate-300'}>Personal Workspace</span>
+                                            <span className={!currentWorkflow ? 'font-bold text-primary font-gta tracking-wide' : 'text-slate-600 dark:text-slate-300 font-gta tracking-wide'}>MY TURF</span>
                                             {!currentWorkflow && <Check className="w-4 h-4 text-primary" />}
                                         </button>
                                         {workflows.map(wf => (
@@ -126,7 +139,7 @@ const Header = ({ onMenuClick }) => {
                                             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
                                         >
                                             <Plus className="w-4 h-4" />
-                                            Create / Join Workflow
+                                            <span className="font-gta tracking-wide">START NEW OPERATION</span>
                                         </button>
                                     </div>
                                 </div>
@@ -154,7 +167,7 @@ const Header = ({ onMenuClick }) => {
                         >
                             <div className="text-right hidden md:block">
                                 <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{displayName}</p>
-                                <p className="text-xs text-slate-500">CRM User</p>
+                                <p className="text-xs font-bold text-green-500 font-gta tracking-wider">{formattedRevenue}</p>
                             </div>
                             <div className="flex items-center gap-2 p-1.5 rounded-xl transition-colors border border-transparent hover:border-slate-200">
                                 <img
@@ -187,7 +200,7 @@ const Header = ({ onMenuClick }) => {
                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
                                         >
                                             <User className="w-4 h-4" />
-                                            <span>My Profile</span>
+                                            <span className="font-gta tracking-wide">THE BOSS</span>
                                         </button>
                                         <button
                                             onClick={() => {
@@ -197,7 +210,7 @@ const Header = ({ onMenuClick }) => {
                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
                                         >
                                             <Share2 className="w-4 h-4" />
-                                            <span>Workflows</span>
+                                            <span className="font-gta tracking-wide">OPERATIONS</span>
                                         </button>
                                         <button
                                             onClick={() => {
@@ -207,9 +220,8 @@ const Header = ({ onMenuClick }) => {
                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
                                         >
                                             <Settings className="w-4 h-4" />
-                                            <span>Account Settings</span>
+                                            <span className="font-gta tracking-wide">SETTINGS</span>
                                         </button>
-
                                         <button
                                             onClick={() => {
                                                 navigate('/profile?tab=support');
@@ -218,7 +230,7 @@ const Header = ({ onMenuClick }) => {
                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
                                         >
                                             <HelpCircle className="w-4 h-4" />
-                                            <span>Help & Support</span>
+                                            <span className="font-gta tracking-wide">BACKUP</span>
                                         </button>
                                     </div>
 
@@ -228,7 +240,7 @@ const Header = ({ onMenuClick }) => {
                                             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-colors font-gta tracking-wide"
                                         >
                                             <LogOut className="w-4 h-4" />
-                                            <span className="text-lg">Sign Out</span>
+                                            <span className="text-lg">BAIL OUT</span>
                                         </button>
                                     </div>
                                 </div>

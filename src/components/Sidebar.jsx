@@ -18,12 +18,12 @@ const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => 
     };
 
     const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-        { icon: Users, label: 'Contacts', path: '/contacts' },
-        { icon: Briefcase, label: 'Deals', path: '/deals' },
-        { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
-        { icon: Calendar, label: 'Calendar', path: '/calendar' },
-        { icon: BarChart2, label: 'Reports', path: '/reports' },
+        { icon: LayoutDashboard, label: 'DASHBOARD', path: '/' },
+        { icon: Users, label: 'THE CREW', path: '/contacts' },
+        { icon: Briefcase, label: 'BIG SCORES', path: '/deals' },
+        { icon: CheckSquare, label: 'MISSIONS', path: '/tasks' },
+        { icon: Calendar, label: 'THE PLAN', path: '/calendar' },
+        { icon: BarChart2, label: 'THE LEDGER', path: '/reports' },
     ];
 
     return (
