@@ -15,8 +15,10 @@
 
 ### 🤖 AI Assistant (Trevor Philips Edition)
 - **Unique Persona**: Meet **Trevor**, your AI assistant inspired by GTA V. He's aggressive, vulgar, but surprisingly efficient.
+- **Full Control**: Trevor can now **Read, Write, and Update** almost everything in the CRM (Contacts, Deals, Tasks, Events, Debts).
+- **Profile & Settings**: Ask him to update your profile, change your password, or tweak your notification settings.
+- **Navigation**: Tell him where you want to go ("Take me to settings", "Go to dashboard").
 - **Voice & Text Commands**: "Add a contact", "Schedule a meeting", or just chat with him (at your own risk).
-- **Smart Actions**: Trevor can create contacts, deals, tasks, and calendar events directly from your conversation.
 - **Context Aware**: He knows today's date, your schedule, and your CRM data.
 
 ### 💼 Deals Pipeline (Kanban)

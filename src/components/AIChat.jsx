@@ -3,7 +3,10 @@ import { MessageSquare, Mic, Send, X, Sparkles, Loader2, Minimize2, Maximize2 } 
 import { useCRM } from '../context/CRMContext';
 import ReactMarkdown from 'react-markdown';
 import { startOfDay, endOfDay, addDays, isWithinInterval } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import TrevorAvatar from '../assets/Trevor.png';
+import * as authService from '../services/authService';
+import { supabase } from '../lib/supabaseClient';
 
 // Trevor's random greetings
 const TREVOR_GREETINGS = [
@@ -31,8 +34,17 @@ const AIChat = ({ isOpen, onClose }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const messagesEndRef = useRef(null);
+    const navigate = useNavigate();
 
-    const { addContact, addDeal, addTask, addEvent, contacts, deals, tasks, events } = useCRM();
+    const {
+        user,
+        contacts, addContact, updateContact, deleteContact,
+        deals, addDeal, updateDeal, moveDeal, deleteDeal,
+        tasks, addTask, updateTask, toggleTask, deleteTask,
+        events, addEvent, updateEvent, deleteEvent,
+        debts, addDebt, updateDebt, deleteDebt,
+        updateUser
+    } = useCRM();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -48,6 +60,7 @@ const AIChat = ({ isOpen, onClose }) => {
         setIsLoading(true);
 
         const tools = [
+            // --- CONTACTS ---
             {
                 type: "function",
                 function: {
@@ -69,6 +82,60 @@ const AIChat = ({ isOpen, onClose }) => {
             {
                 type: "function",
                 function: {
+                    name: "update_contact",
+                    description: "Update an existing contact",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            name: { type: "string", description: "Name of the contact to update (to find them)" },
+                            updates: {
+                                type: "object",
+                                description: "Fields to update",
+                                properties: {
+                                    name: { type: "string" },
+                                    company: { type: "string" },
+                                    role: { type: "string" },
+                                    email: { type: "string" },
+                                    phone: { type: "string" }
+                                }
+                            }
+                        },
+                        required: ["name", "updates"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "delete_contact",
+                    description: "Delete a contact from the CRM",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            name: { type: "string", description: "Name of the contact to delete" }
+                        },
+                        required: ["name"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "search_contacts",
+                    description: "Search for contacts in the CRM by name or company",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            query: { type: "string", description: "Search query (name or company)" }
+                        }
+                    }
+                }
+            },
+
+            // --- DEALS ---
+            {
+                type: "function",
+                function: {
                     name: "add_deal",
                     description: "Add a new deal to the pipeline",
                     parameters: {
@@ -85,6 +152,74 @@ const AIChat = ({ isOpen, onClose }) => {
             {
                 type: "function",
                 function: {
+                    name: "update_deal",
+                    description: "Update an existing deal",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string", description: "Title of the deal to update (to find it)" },
+                            updates: {
+                                type: "object",
+                                description: "Fields to update",
+                                properties: {
+                                    title: { type: "string" },
+                                    amount: { type: "string" },
+                                    clientName: { type: "string" }
+                                }
+                            }
+                        },
+                        required: ["title", "updates"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "move_deal",
+                    description: "Move a deal to a different stage/status",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string", description: "Title of the deal to move" },
+                            status: { type: "string", enum: ["lead", "qualified", "proposal", "negotiation", "won", "lost"], description: "New status/stage" }
+                        },
+                        required: ["title", "status"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "delete_deal",
+                    description: "Delete a deal",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string", description: "Title of the deal to delete" }
+                        },
+                        required: ["title"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "get_deals",
+                    description: "Get deals from the pipeline, optionally filtered by status or search query",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            status: { type: "string", enum: ["lead", "qualified", "proposal", "negotiation", "won", "lost"], description: "Filter by deal status/stage" },
+                            query: { type: "string", description: "Search query for deal title or client name" }
+                        }
+                    }
+                }
+            },
+
+            // --- TASKS ---
+            {
+                type: "function",
+                function: {
                     name: "add_task",
                     description: "Add a new task",
                     parameters: {
@@ -98,6 +233,74 @@ const AIChat = ({ isOpen, onClose }) => {
                     }
                 }
             },
+            {
+                type: "function",
+                function: {
+                    name: "update_task",
+                    description: "Update a task",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string", description: "Title of the task to update (to find it)" },
+                            updates: {
+                                type: "object",
+                                description: "Fields to update",
+                                properties: {
+                                    title: { type: "string" },
+                                    priority: { type: "string", enum: ["low", "medium", "high"] },
+                                    date: { type: "string" }
+                                }
+                            }
+                        },
+                        required: ["title", "updates"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "toggle_task",
+                    description: "Mark a task as complete or incomplete",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string", description: "Title of the task" },
+                            completed: { type: "boolean", description: "True for complete, false for incomplete" }
+                        },
+                        required: ["title"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "delete_task",
+                    description: "Delete a task",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string", description: "Title of the task to delete" }
+                        },
+                        required: ["title"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "get_tasks",
+                    description: "Get current tasks, optionally filtered by completion status or priority",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            completed: { type: "boolean", description: "Filter by completion status" },
+                            priority: { type: "string", enum: ["low", "medium", "high"], description: "Filter by priority" }
+                        }
+                    }
+                }
+            },
+
+            // --- EVENTS ---
             {
                 type: "function",
                 function: {
@@ -132,12 +335,119 @@ const AIChat = ({ isOpen, onClose }) => {
             {
                 type: "function",
                 function: {
-                    name: "search_contacts",
-                    description: "Search for contacts in the CRM by name or company",
+                    name: "delete_event",
+                    description: "Delete an event from the calendar",
                     parameters: {
                         type: "object",
                         properties: {
-                            query: { type: "string", description: "Search query (name or company)" }
+                            title: { type: "string", description: "Title of the event to delete" }
+                        },
+                        required: ["title"]
+                    }
+                }
+            },
+
+            // --- DEBTS ---
+            {
+                type: "function",
+                function: {
+                    name: "get_debts",
+                    description: "Get list of debts/loans",
+                    parameters: {
+                        type: "object",
+                        properties: {}
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "add_debt",
+                    description: "Add a new debt record",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            person: { type: "string", description: "Name of the person" },
+                            amount: { type: "number", description: "Amount of money" },
+                            description: { type: "string", description: "Description of the debt" },
+                            dueDate: { type: "string", description: "Due date (YYYY-MM-DD)" }
+                        },
+                        required: ["person", "amount"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "delete_debt",
+                    description: "Delete a debt record",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            person: { type: "string", description: "Name of the person" },
+                            amount: { type: "number", description: "Amount (to help identify the specific debt)" }
+                        },
+                        required: ["person"]
+                    }
+                }
+            },
+
+            // --- NAVIGATION ---
+            {
+                type: "function",
+                function: {
+                    name: "navigate_to",
+                    description: "Navigate to a specific page in the app",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            page: {
+                                type: "string",
+                                enum: ["dashboard", "contacts", "deals", "tasks", "calendar", "reports", "profile", "settings", "debts"],
+                                description: "Page to navigate to"
+                            }
+                        },
+                        required: ["page"]
+                    }
+                }
+            },
+
+            // --- SETTINGS & PROFILE ---
+            {
+                type: "function",
+                function: {
+                    name: "get_profile",
+                    description: "Get current user profile information",
+                    parameters: {
+                        type: "object",
+                        properties: {}
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "update_profile",
+                    description: "Update user profile information (name)",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            fullName: { type: "string", description: "New full name" }
+                        },
+                        required: ["fullName"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "update_settings",
+                    description: "Update application settings (notifications, timezone)",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            ntfyUrl: { type: "string", description: "ntfy.sh topic URL" },
+                            timezone: { type: "string", description: "Timezone string (e.g. 'America/New_York')" }
                         }
                     }
                 }
@@ -145,28 +455,14 @@ const AIChat = ({ isOpen, onClose }) => {
             {
                 type: "function",
                 function: {
-                    name: "get_tasks",
-                    description: "Get current tasks, optionally filtered by completion status or priority",
+                    name: "change_password",
+                    description: "Change user password",
                     parameters: {
                         type: "object",
                         properties: {
-                            completed: { type: "boolean", description: "Filter by completion status" },
-                            priority: { type: "string", enum: ["low", "medium", "high"], description: "Filter by priority" }
-                        }
-                    }
-                }
-            },
-            {
-                type: "function",
-                function: {
-                    name: "get_deals",
-                    description: "Get deals from the pipeline, optionally filtered by status or search query",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            status: { type: "string", enum: ["lead", "qualified", "proposal", "negotiation", "won", "lost"], description: "Filter by deal status/stage" },
-                            query: { type: "string", description: "Search query for deal title or client name" }
-                        }
+                            newPassword: { type: "string", description: "New password" }
+                        },
+                        required: ["newPassword"]
                     }
                 }
             }
@@ -243,17 +539,142 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                     const functionName = toolCall.function.name;
                     const functionArgs = JSON.parse(toolCall.function.arguments);
 
+                    // --- CONTACTS ---
                     if (functionName === "add_contact") {
                         const result = await addContact(functionArgs);
                         actionResult = result ? `Added contact: ${functionArgs.name}` : "Failed to add contact.";
-                    } else if (functionName === "add_deal") {
+                    } else if (functionName === "update_contact") {
+                        const contact = contacts.find(c => c.name.toLowerCase().includes(functionArgs.name.toLowerCase()));
+                        if (contact) {
+                            await updateContact(contact.id, functionArgs.updates);
+                            actionResult = `Updated contact: ${contact.name}`;
+                        } else {
+                            actionResult = `Could not find contact: ${functionArgs.name}`;
+                        }
+                    } else if (functionName === "delete_contact") {
+                        const contact = contacts.find(c => c.name.toLowerCase().includes(functionArgs.name.toLowerCase()));
+                        if (contact) {
+                            await deleteContact(contact.id);
+                            actionResult = `Deleted contact: ${contact.name}`;
+                        } else {
+                            actionResult = `Could not find contact: ${functionArgs.name}`;
+                        }
+                    } else if (functionName === "search_contacts") {
+                        const query = functionArgs.query.toLowerCase();
+                        const results = contacts.filter(c =>
+                            c.name.toLowerCase().includes(query) ||
+                            c.company.toLowerCase().includes(query)
+                        );
+                        actionResult = results.length > 0
+                            ? `Found ${results.length} contact(s):\n${results.map(c => `- ${c.name} (${c.company}) - ${c.email} - Phone: ${c.phone || 'N/A'}`).join('\n')}`
+                            : `No contacts found matching "${functionArgs.query}"`;
+                    }
+
+                    // --- DEALS ---
+                    else if (functionName === "add_deal") {
                         const result = await addDeal(functionArgs);
                         actionResult = result ? `Added deal: ${functionArgs.title}` : "Failed to add deal.";
-                    } else if (functionName === "add_task") {
+                    } else if (functionName === "update_deal") {
+                        let allDeals = [];
+                        Object.values(deals).forEach(col => { if (col.items) allDeals = [...allDeals, ...col.items]; });
+                        const deal = allDeals.find(d => d.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (deal) {
+                            await updateDeal(deal.id, functionArgs.updates);
+                            actionResult = `Updated deal: ${deal.title}`;
+                        } else {
+                            actionResult = `Could not find deal: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "move_deal") {
+                        let allDeals = [];
+                        Object.values(deals).forEach(col => { if (col.items) allDeals = [...allDeals, ...col.items]; });
+                        const deal = allDeals.find(d => d.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (deal) {
+                            await moveDeal(deal.id, functionArgs.status);
+                            actionResult = `Moved deal ${deal.title} to ${functionArgs.status}`;
+                        } else {
+                            actionResult = `Could not find deal: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "delete_deal") {
+                        let allDeals = [];
+                        Object.values(deals).forEach(col => { if (col.items) allDeals = [...allDeals, ...col.items]; });
+                        const deal = allDeals.find(d => d.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (deal) {
+                            await deleteDeal(deal.id);
+                            actionResult = `Deleted deal: ${deal.title}`;
+                        } else {
+                            actionResult = `Could not find deal: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "get_deals") {
+                        let allDeals = [];
+                        Object.values(deals).forEach(column => {
+                            if (column.items) {
+                                const itemsWithStatus = column.items.map(item => ({ ...item, status: column.id }));
+                                allDeals = [...allDeals, ...itemsWithStatus];
+                            }
+                        });
+
+                        let filteredDeals = allDeals;
+                        if (functionArgs.status) {
+                            filteredDeals = filteredDeals.filter(d => d.status === functionArgs.status);
+                        }
+                        if (functionArgs.query) {
+                            const q = functionArgs.query.toLowerCase();
+                            filteredDeals = filteredDeals.filter(d =>
+                                d.title.toLowerCase().includes(q) ||
+                                (d.clientName && d.clientName.toLowerCase().includes(q))
+                            );
+                        }
+
+                        actionResult = filteredDeals.length > 0
+                            ? `Found ${filteredDeals.length} deal(s):\n${filteredDeals.map(d => `- ${d.title}: ${d.amount} (${d.status})`).join('\n')}`
+                            : `No deals found matching your criteria.`;
+                    }
+
+                    // --- TASKS ---
+                    else if (functionName === "add_task") {
                         const result = await addTask(functionArgs);
                         actionResult = result ? `Added task: ${functionArgs.title}` : "Failed to add task.";
-                    } else if (functionName === "add_event") {
-                        // AI should now provide YYYY-MM-DD due to system prompt context
+                    } else if (functionName === "update_task") {
+                        const task = tasks.find(t => t.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (task) {
+                            await updateTask(task.id, functionArgs.updates);
+                            actionResult = `Updated task: ${task.title}`;
+                        } else {
+                            actionResult = `Could not find task: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "toggle_task") {
+                        const task = tasks.find(t => t.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (task) {
+                            if (task.completed !== functionArgs.completed) {
+                                await toggleTask(task.id);
+                            }
+                            actionResult = `Marked task ${task.title} as ${functionArgs.completed ? 'complete' : 'incomplete'}`;
+                        } else {
+                            actionResult = `Could not find task: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "delete_task") {
+                        const task = tasks.find(t => t.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (task) {
+                            await deleteTask(task.id);
+                            actionResult = `Deleted task: ${task.title}`;
+                        } else {
+                            actionResult = `Could not find task: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "get_tasks") {
+                        let filteredTasks = tasks;
+                        if (functionArgs.completed !== undefined) {
+                            filteredTasks = filteredTasks.filter(t => t.completed === functionArgs.completed);
+                        }
+                        if (functionArgs.priority) {
+                            filteredTasks = filteredTasks.filter(t => t.priority === functionArgs.priority);
+                        }
+                        actionResult = filteredTasks.length > 0
+                            ? `Tasks:\n${filteredTasks.map(t => `- ${t.title} (${t.priority} priority) - ${t.date}`).join('\n')}`
+                            : `No tasks found with the specified criteria.`;
+                    }
+
+                    // --- EVENTS ---
+                    else if (functionName === "add_event") {
                         const result = await addEvent(functionArgs);
                         if (result) {
                             const dateObj = new Date(functionArgs.date);
@@ -275,54 +696,75 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                         actionResult = upcomingEvents.length > 0
                             ? `Upcoming events:\n${upcomingEvents.map(e => `- ${e.title} on ${new Date(e.date).toLocaleDateString()} at ${e.time} (${e.type})`).join('\n')}`
                             : `No upcoming events found from ${today.toLocaleDateString()} to ${endDate.toLocaleDateString()}.`;
-                    } else if (functionName === "search_contacts") {
-                        const query = functionArgs.query.toLowerCase();
-                        const results = contacts.filter(c =>
-                            c.name.toLowerCase().includes(query) ||
-                            c.company.toLowerCase().includes(query)
+                    } else if (functionName === "delete_event") {
+                        const event = events.find(e => e.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
+                        if (event) {
+                            await deleteEvent(event.id);
+                            actionResult = `Deleted event: ${event.title}`;
+                        } else {
+                            actionResult = `Could not find event: ${functionArgs.title}`;
+                        }
+                    }
+
+                    // --- DEBTS ---
+                    else if (functionName === "get_debts") {
+                        let allDebts = [];
+                        Object.values(debts).forEach(col => { if (col.items) allDebts = [...allDebts, ...col.items]; });
+                        actionResult = allDebts.length > 0
+                            ? `Debts:\n${allDebts.map(d => `- ${d.person}: $${d.amount} (${d.description})`).join('\n')}`
+                            : "No debts found.";
+                    } else if (functionName === "add_debt") {
+                        await addDebt(functionArgs);
+                        actionResult = `Added debt for ${functionArgs.person}: $${functionArgs.amount}`;
+                    } else if (functionName === "delete_debt") {
+                        let allDebts = [];
+                        Object.values(debts).forEach(col => { if (col.items) allDebts = [...allDebts, ...col.items]; });
+                        const debt = allDebts.find(d =>
+                            d.person.toLowerCase().includes(functionArgs.person.toLowerCase()) &&
+                            (functionArgs.amount ? d.amount === functionArgs.amount : true)
                         );
-                        actionResult = results.length > 0
-                            ? `Found ${results.length} contact(s):\n${results.map(c => `- ${c.name} (${c.company}) - ${c.email} - Phone: ${c.phone || 'N/A'}`).join('\n')}`
-                            : `No contacts found matching "${functionArgs.query}"`;
-                    } else if (functionName === "get_tasks") {
-                        let filteredTasks = tasks;
-                        if (functionArgs.completed !== undefined) {
-                            filteredTasks = filteredTasks.filter(t => t.completed === functionArgs.completed);
+                        if (debt) {
+                            await deleteDebt(debt.id);
+                            actionResult = `Deleted debt for ${debt.person}`;
+                        } else {
+                            actionResult = `Could not find debt for ${functionArgs.person}`;
                         }
-                        if (functionArgs.priority) {
-                            filteredTasks = filteredTasks.filter(t => t.priority === functionArgs.priority);
+                    }
+
+                    // --- NAVIGATION ---
+                    else if (functionName === "navigate_to") {
+                        const page = functionArgs.page;
+                        switch (page) {
+                            case 'dashboard': navigate('/'); break;
+                            case 'contacts': navigate('/contacts'); break;
+                            case 'deals': navigate('/deals'); break;
+                            case 'tasks': navigate('/tasks'); break;
+                            case 'calendar': navigate('/calendar'); break;
+                            case 'reports': navigate('/reports'); break;
+                            case 'profile': navigate('/profile?tab=profile'); break;
+                            case 'settings': navigate('/profile?tab=settings'); break;
+                            case 'debts': navigate('/profile?tab=ledger'); break;
+                            default: navigate('/');
                         }
-                        actionResult = filteredTasks.length > 0
-                            ? `Tasks:\n${filteredTasks.map(t => `- ${t.title} (${t.priority} priority) - ${t.date}`).join('\n')}`
-                            : `No tasks found with the specified criteria.`;
-                    } else if (functionName === "get_deals") {
-                        let allDeals = [];
-                        // Flatten deals from all columns
-                        Object.values(deals).forEach(column => {
-                            if (column.items) {
-                                // Add status to the deal object for easier reference in the output
-                                const itemsWithStatus = column.items.map(item => ({ ...item, status: column.id }));
-                                allDeals = [...allDeals, ...itemsWithStatus];
-                            }
+                        actionResult = `Navigated to ${page}`;
+                    }
+
+                    // --- SETTINGS & PROFILE ---
+                    else if (functionName === "get_profile") {
+                        const profile = await authService.getUserProfile(user.id);
+                        actionResult = `Profile: Name: ${user.user_metadata?.full_name || 'N/A'}, Email: ${user.email}, Timezone: ${profile.data?.timezone || 'N/A'}, Notification URL: ${profile.data?.ntfy_url || 'N/A'}`;
+                    } else if (functionName === "update_profile") {
+                        await supabase.auth.updateUser({ data: { full_name: functionArgs.fullName } });
+                        actionResult = `Updated profile name to: ${functionArgs.fullName}`;
+                    } else if (functionName === "update_settings") {
+                        await updateUser({
+                            ntfy_url: functionArgs.ntfyUrl,
+                            timezone: functionArgs.timezone
                         });
-
-                        let filteredDeals = allDeals;
-
-                        if (functionArgs.status) {
-                            filteredDeals = filteredDeals.filter(d => d.status === functionArgs.status);
-                        }
-
-                        if (functionArgs.query) {
-                            const q = functionArgs.query.toLowerCase();
-                            filteredDeals = filteredDeals.filter(d =>
-                                d.title.toLowerCase().includes(q) ||
-                                (d.clientName && d.clientName.toLowerCase().includes(q))
-                            );
-                        }
-
-                        actionResult = filteredDeals.length > 0
-                            ? `Found ${filteredDeals.length} deal(s):\n${filteredDeals.map(d => `- ${d.title}: ${d.amount} (${d.status})`).join('\n')}`
-                            : `No deals found matching your criteria.`;
+                        actionResult = "Updated settings successfully.";
+                    } else if (functionName === "change_password") {
+                        await supabase.auth.updateUser({ password: functionArgs.newPassword });
+                        actionResult = "Password updated successfully.";
                     }
                 }
 
