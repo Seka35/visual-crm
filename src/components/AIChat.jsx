@@ -335,6 +335,20 @@ const AIChat = ({ isOpen, onClose }) => {
             {
                 type: "function",
                 function: {
+                    name: "get_schedule",
+                    description: "Get both tasks and events for a specific date or range. Use this when asked about 'schedule', 'day', 'tomorrow', or 'what do I have to do'.",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            date: { type: "string", description: "Target date (YYYY-MM-DD). Defaults to today." },
+                            days: { type: "number", description: "Number of days to include (default: 1)" }
+                        }
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
                     name: "delete_event",
                     description: "Delete an event from the calendar",
                     parameters: {
@@ -704,6 +718,59 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                         } else {
                             actionResult = `Could not find event: ${functionArgs.title}`;
                         }
+                    } else if (functionName === "get_schedule") {
+                        const targetDateStr = functionArgs.date || new Date().toISOString().split('T')[0];
+                        const days = functionArgs.days || 1;
+                        const targetDate = new Date(targetDateStr);
+
+                        // Filter Events
+                        const relevantEvents = events.filter(e => {
+                            if (!e.date) return false;
+                            const eventDate = new Date(e.date);
+                            return isWithinInterval(eventDate, {
+                                start: startOfDay(targetDate),
+                                end: endOfDay(addDays(targetDate, days - 1))
+                            });
+                        }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                        // Filter Tasks
+                        const relevantTasks = tasks.filter(t => {
+                            if (!t.date) return false;
+
+                            let taskDateObj = null;
+                            if (t.date.toLowerCase() === 'today') {
+                                taskDateObj = new Date();
+                            } else if (t.date.toLowerCase() === 'tomorrow') {
+                                taskDateObj = addDays(new Date(), 1);
+                            } else {
+                                const parsed = new Date(t.date);
+                                if (!isNaN(parsed.getTime())) taskDateObj = parsed;
+                            }
+
+                            if (taskDateObj) {
+                                return isWithinInterval(taskDateObj, {
+                                    start: startOfDay(targetDate),
+                                    end: endOfDay(addDays(targetDate, days - 1))
+                                });
+                            }
+                            return false;
+                        });
+
+                        let result = `Schedule for ${targetDateStr} (${days} day${days > 1 ? 's' : ''}):\n\n`;
+
+                        if (relevantEvents.length > 0) {
+                            result += `EVENTS:\n${relevantEvents.map(e => `- [${e.time}] ${e.title} (${e.type})`).join('\n')}\n\n`;
+                        } else {
+                            result += "EVENTS: No events scheduled.\n\n";
+                        }
+
+                        if (relevantTasks.length > 0) {
+                            result += `TASKS:\n${relevantTasks.map(t => `- ${t.title} (Priority: ${t.priority})`).join('\n')}`;
+                        } else {
+                            result += "TASKS: No tasks due.";
+                        }
+
+                        actionResult = result;
                     }
 
                     // --- DEBTS ---
@@ -711,21 +778,26 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                         let allDebts = [];
                         Object.values(debts).forEach(col => { if (col.items) allDebts = [...allDebts, ...col.items]; });
                         actionResult = allDebts.length > 0
-                            ? `Debts:\n${allDebts.map(d => `- ${d.person}: $${d.amount} (${d.description})`).join('\n')}`
+                            ? `Debts:\n${allDebts.map(d => `- ${d.borrower_name}: Lent ${d.amount_lent}, Repaid ${d.amount_repaid} (Status: ${d.status}) - ${d.description || 'No description'}`).join('\n')}`
                             : "No debts found.";
                     } else if (functionName === "add_debt") {
-                        await addDebt(functionArgs);
+                        await addDebt({
+                            borrowerName: functionArgs.person,
+                            amountLent: functionArgs.amount.toString(),
+                            description: functionArgs.description,
+                            dateLent: functionArgs.dueDate
+                        });
                         actionResult = `Added debt for ${functionArgs.person}: $${functionArgs.amount}`;
                     } else if (functionName === "delete_debt") {
                         let allDebts = [];
                         Object.values(debts).forEach(col => { if (col.items) allDebts = [...allDebts, ...col.items]; });
                         const debt = allDebts.find(d =>
-                            d.person.toLowerCase().includes(functionArgs.person.toLowerCase()) &&
-                            (functionArgs.amount ? d.amount === functionArgs.amount : true)
+                            d.borrower_name.toLowerCase().includes(functionArgs.person.toLowerCase()) &&
+                            (functionArgs.amount ? d.amount_lent.includes(functionArgs.amount.toString()) : true)
                         );
                         if (debt) {
                             await deleteDebt(debt.id);
-                            actionResult = `Deleted debt for ${debt.person}`;
+                            actionResult = `Deleted debt for ${debt.borrower_name}`;
                         } else {
                             actionResult = `Could not find debt for ${functionArgs.person}`;
                         }
