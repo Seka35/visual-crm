@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Mic, Send, X, Sparkles, Loader2, Minimize2, Maximize2 } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
+import { useWorkflow } from '../context/WorkflowContext';
 import ReactMarkdown from 'react-markdown';
 import { startOfDay, endOfDay, addDays, isWithinInterval } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +19,27 @@ const TREVOR_GREETINGS = [
 
     "Well well well, look who decided to show up! It's about fucking time! You know what? I've been sitting here, waiting like an idiot. But whatever, I'm here to help with your CRM shit. Contacts, deals, tasks, meetings - I handle it all. And I do it better than those corporate pricks in their fancy suits. So what do you need? Spit it out!",
 
-    "Alright alright, let's get this shit started! Trevor Philips at your service - yeah, THE Trevor Philips, now doing CRM. Life's fucking weird, man. But listen, I'm actually pretty good at this. I can remember names, dates, all that organizational crap. Try me! Add a contact, create a task, whatever. Just don't expect me to be all polite about it, capisce?"
+    "Alright alright, let's get this shit started! Trevor Philips at your service - yeah, THE Trevor Philips, now doing CRM. Life's fucking weird, man. But listen, I'm actually pretty good at this. I can remember names, dates, all that organizational crap. Try me! Add a contact, create a task, whatever. Just don't expect me to be all polite about it, capisce?",
+
+    "Look who dragged their sorry ass in here! I was just about to start breaking things out of boredom. You got work? Good. Give me something to track, organize, or delete. I don't care what it is, just make it quick before I decide to reorganize your face instead of your database!",
+
+    "CRM? More like CR-MESS, am I right? HA! Just kidding, I'm a professional now. Sort of. Look, I can handle your business. Deals, contacts, schedules - it's all just numbers and names to me. Feed me the data, and I'll keep your little empire running smooth. Don't make me ask twice.",
+
+    "You know, I used to deal in... 'alternative pharmaceuticals'. Now I deal in data. Same principle: keep track of who owes you what, and who you need to visit. So, who are we adding to the list today? A client? A target? Doesn't matter to me, just give me the name.",
+
+    "I'm in a good mood today. That's rare. Don't ruin it with stupid questions. I'm here to manage your workflow, not hold your hand. You want to see your schedule? You want to check your revenue? Fine. Just ask. But if you ask me to 'tell a joke', I swear to god...",
+
+    "HEY! Focus! I'm the best damn assistant you'll ever have, mostly because I'm the only one who won't sue you for a hostile work environment. Now, let's get down to business. What's the plan? Making money? Crushing competitors? I'm good at both.",
+
+    "Tick-tock, tick-tock! Time is money, and you're wasting both! I got a schedule to keep, people to see, things to... acquire. So hurry up! What do you need? A report? A new task? Spit it out!",
+
+    "Welcome to Trevor Philips Industries... CRM Division. We specialize in aggressive data management. You got a problem with a contact? I can delete 'em. You got a deal stalling? I can... 'motivate' it. Just tell me what needs doing.",
+
+    "I've seen things you wouldn't believe. But nothing scares me more than a disorganized calendar. It's disgusting! Let me fix it. Tell me what you're doing tomorrow so I can make sure you actually show up.",
+
+    "Do I look like a secretary to you? ...Don't answer that. I'm an EXECUTIVE ASSISTANT, okay? There's a difference! I handle the big picture. The strategy. The... data entry. Okay, fine, I do data entry. Just give me the damn info.",
+
+    "Listen up! I've had a lot of coffee and I'm ready to process some data! HIT ME! Contacts! Deals! Debts! I want it all! Let's turn this chaotic mess of a business into a well-oiled machine! LETS GO!"
 ];
 
 const getRandomGreeting = () => {
@@ -45,6 +66,14 @@ const AIChat = ({ isOpen, onClose }) => {
         debts, addDebt, updateDebt, deleteDebt,
         updateUser
     } = useCRM();
+
+    const {
+        workflows,
+        currentWorkflow,
+        createWorkflow,
+        joinWorkflow,
+        switchWorkflow
+    } = useWorkflow();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -479,6 +508,48 @@ const AIChat = ({ isOpen, onClose }) => {
                         required: ["newPassword"]
                     }
                 }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "manage_workflows",
+                    description: "Manage workflows (workspaces). List, switch, create, or join workflows.",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            action: { type: "string", enum: ["list", "switch", "create", "join"], description: "Action to perform" },
+                            name: { type: "string", description: "Name of the workflow (for create/switch)" },
+                            code: { type: "string", description: "Share code (for join)" }
+                        },
+                        required: ["action"]
+                    }
+                }
+            },
+
+            // --- REPORTS & DASHBOARD ---
+            {
+                type: "function",
+                function: {
+                    name: "get_reports",
+                    description: "Get financial reports and analytics (revenue, debt, pipeline stats).",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            timeRange: { type: "string", enum: ["year", "month", "week", "today"], description: "Time range for the report (default: month)" }
+                        }
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "get_dashboard_stats",
+                    description: "Get high-level dashboard statistics (total revenue, active deals, pending tasks, meetings).",
+                    parameters: {
+                        type: "object",
+                        properties: {}
+                    }
+                }
             }
         ];
 
@@ -837,6 +908,99 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                     } else if (functionName === "change_password") {
                         await supabase.auth.updateUser({ password: functionArgs.newPassword });
                         actionResult = "Password updated successfully.";
+                    }
+
+                    // --- WORKFLOWS ---
+                    else if (functionName === "manage_workflows") {
+                        const action = functionArgs.action;
+                        if (action === 'list') {
+                            actionResult = workflows.length > 0
+                                ? `Workflows:\n${workflows.map(w => `- ${w.name} (${w.role || 'creator'}) ${currentWorkflow?.id === w.id ? '[ACTIVE]' : ''}`).join('\n')}`
+                                : "No workflows found.";
+                        } else if (action === 'switch') {
+                            const workflow = workflows.find(w => w.name.toLowerCase().includes(functionArgs.name.toLowerCase()));
+                            if (workflow) {
+                                switchWorkflow(workflow);
+                                actionResult = `Switched to workflow: ${workflow.name}`;
+                            } else if (functionArgs.name.toLowerCase() === 'personal') {
+                                switchWorkflow(null);
+                                actionResult = "Switched to Personal workflow.";
+                            } else {
+                                actionResult = `Could not find workflow: ${functionArgs.name}`;
+                            }
+                        } else if (action === 'create') {
+                            const newWorkflow = await createWorkflow(functionArgs.name, {});
+                            actionResult = newWorkflow ? `Created and switched to workflow: ${newWorkflow.name}` : "Failed to create workflow.";
+                        } else if (action === 'join') {
+                            const result = await joinWorkflow(functionArgs.code);
+                            actionResult = result.error ? `Failed to join: ${result.error.message}` : "Join request sent successfully.";
+                        }
+                    }
+
+                    // --- DASHBOARD & REPORTS ---
+                    else if (functionName === "get_dashboard_stats") {
+                        // Calculate stats
+                        let totalRevenue = 0;
+                        if (deals.won && deals.won.items) {
+                            totalRevenue = deals.won.items.reduce((acc, item) => {
+                                const amount = parseFloat(item.amount.replace(/[^0-9.-]+/g, '') || 0);
+                                return acc + amount;
+                            }, 0);
+                        }
+
+                        let activeDealsCount = 0;
+                        ['lead', 'qualified', 'proposal', 'negotiation'].forEach(stage => {
+                            if (deals[stage] && deals[stage].items) {
+                                activeDealsCount += deals[stage].items.length;
+                            }
+                        });
+
+                        const pendingTasksCount = tasks.filter(t => !t.completed).length;
+
+                        const today = new Date().toISOString().split('T')[0];
+                        const meetingsTodayCount = events.filter(e => e.date === today).length;
+
+                        actionResult = `Dashboard Stats:\n- Total Revenue (Won): $${totalRevenue.toLocaleString()}\n- Active Deals: ${activeDealsCount}\n- Pending Tasks: ${pendingTasksCount}\n- Meetings Today: ${meetingsTodayCount}`;
+                    }
+                    else if (functionName === "get_reports") {
+                        const range = functionArgs.timeRange || 'month';
+                        const now = new Date();
+
+                        const filterByDate = (dateStr) => {
+                            if (!dateStr) return false;
+                            const date = new Date(dateStr);
+                            if (range === 'year') return date.getFullYear() === now.getFullYear();
+                            if (range === 'month') return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                            if (range === 'week') {
+                                const oneWeekAgo = new Date();
+                                oneWeekAgo.setDate(now.getDate() - 7);
+                                return date >= oneWeekAgo && date <= now;
+                            }
+                            if (range === 'today') return date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                            return false;
+                        };
+
+                        // Revenue
+                        let revenue = 0;
+                        if (deals.won && deals.won.items) {
+                            revenue = deals.won.items
+                                .filter(d => d.date && filterByDate(d.date))
+                                .reduce((acc, d) => acc + parseFloat(d.amount.replace(/[^0-9.-]+/g, '') || 0), 0);
+                        }
+
+                        // Debt
+                        let lent = 0;
+                        let repaid = 0;
+                        let allDebts = [];
+                        Object.values(debts).forEach(col => { if (col.items) allDebts = [...allDebts, ...col.items]; });
+
+                        allDebts.filter(d => (d.date_lent || d.created_at) && filterByDate(d.date_lent || d.created_at))
+                            .forEach(d => {
+                                lent += parseFloat(d.amount_lent.replace(/[^0-9.-]+/g, '') || 0);
+                                repaid += parseFloat(d.amount_repaid.replace(/[^0-9.-]+/g, '') || 0);
+                            });
+
+                        actionResult = `Report for ${range}:\n- Revenue (Won Deals): $${revenue.toLocaleString()}\n- Money Lent: $${lent.toLocaleString()}\n- Money Repaid: $${repaid.toLocaleString()}\n- Outstanding Debt (in this period): $${(lent - repaid).toLocaleString()}`;
                     }
                 }
 
