@@ -9,11 +9,22 @@
 ## ✨ Key Features
 
 ### 📊 Interactive Dashboard
+![Dashboard](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Dashboard.png)
 - **Real-time KPIs**: Track Total Revenue, Active Deals, Pending Tasks, and Meetings at a glance.
 - **Visual Pipeline**: A beautiful progress bar widget showing the distribution of deals across stages.
-- **Draggable Widgets**: Customize your dashboard layout with drag-and-drop functionality.
+- **Adaptive Widgets**: Automatically hides widgets that aren't relevant to your current workflow permissions.
+- **Draggable Layout**: Customize your dashboard by dragging and dropping widgets to suit your style.
+
+### 🔄 Workflows (Schemes)
+![Workflow](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Workflow.png)
+- **Collaborative Spaces**: Create separate workspaces (Schemes) for different projects or teams.
+- **Granular Permissions**: Define exactly what each workflow has access to (e.g., only Contacts and Debts, or everything).
+- **Adaptive Dashboard**: The dashboard automatically hides widgets and KPIs that the current workflow doesn't have access to.
+- **Easy Sharing**: Share a simple 6-character code to invite others to your workflow.
+- **Admin Controls**: Admins can manage members and update permissions on the fly.
 
 ### 🤖 AI Assistant (Trevor Philips Edition)
+![ChatAI](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Chat.png)
 - **Unique Persona**: Meet **Trevor**, your AI assistant inspired by GTA V. He's aggressive, vulgar, but surprisingly efficient.
 - **Full Control**: Trevor can now **Read, Write, and Update** almost everything in the CRM (Contacts, Deals, Tasks, Events, Debts).
 - **Profile & Settings**: Ask him to update your profile, change your password, or tweak your notification settings.
@@ -22,16 +33,13 @@
 - **Context Aware**: He knows today's date, your schedule, and your CRM data.
 
 ### 💼 Deals Pipeline (Kanban)
+![Deals](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Deals.png)
 - **Drag & Drop**: Move deals between stages (Lead, Qualified, Proposal, Negotiation, Won) effortlessly.
 - **Visual Feedback**: Smooth animations and color-coded stages.
 - **Quick Actions**: Add, edit, or delete deals on the fly.
 
-### 🔔 Notifications & Reminders
-- **Ntfy Integration**: Receive real-time notifications on your phone or desktop via `ntfy.sh`.
-- **Task Reminders**: Set specific times for your tasks and get notified when they are due.
-- **Workflow Alerts**: Get notified about important workflow updates.
-
 ### 👥 Contact Management
+![Contact](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/contact.png)
 - **Centralized Database**: Store all your contacts with details like Company, Role, Email, and Phone.
 - **Smart Avatars**: Automatically assigns a default "Crew" image if none is provided.
 - **Image Upload**: Upload custom profile pictures directly to Supabase storage.
@@ -39,10 +47,29 @@
 - **Direct Actions**: Call or email directly from the contact card.
 
 ### 💰 Debt Management (The Depts)
+![Depts](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/depts.png)
 - **Track Debts**: Keep track of who owes you money and how much.
 - **Visual Status**: See at a glance if a debt is Lent, Partially Repaid, or Fully Repaid.
 - **Reminders**: Set due dates and get notified when it's time to collect.
 - **Drag & Drop**: Easily update status by moving cards between columns.
+
+### ✅ Task Management (Missions)
+![Task](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Tasks.png)
+- **Organize Missions**: Keep track of your to-dos with a sleek interface.
+- **Priority Levels**: Mark tasks as High, Medium, or Low priority.
+- **Reminders**: Set specific times for your tasks and get notified when they are due.
+
+### 📅 Calendar (The Plan)
+![Calendar](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Calendar.png)
+- **Schedule Events**: Manage your meetings and sit-downs.
+- **Drag & Drop**: Easily reschedule events by dragging them to a new time slot.
+- **Integration**: Events sync with your dashboard and AI assistant.
+
+### 📈 Reports (Ledger)
+![Ledger](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/Ledger.png)
+- **Visual Analytics**: View detailed charts of your revenue and deal performance.
+- **Time Filters**: Analyze data by Year, Month, Week, or Today.
+- **Forecasts**: Get insights into your financial future.
 
 ---
 
@@ -108,15 +135,6 @@ Visual Auto CRM uses **ntfy.sh** for real-time notifications. Here is how to set
     2.  Click the `+` button to subscribe.
     3.  Enter your topic name (e.g., `visual-crm-tony-123`).
     4.  You will now receive push notifications for task reminders and workflow alerts!
-
----
-
-## 🎨 UI/UX Highlights
-
-- **Glassmorphism**: Translucent cards with background blur for a modern, premium feel.
-- **Dark Mode First**: Designed natively for dark mode to reduce eye strain and look cool.
-- **Micro-interactions**: Subtle hover effects and transitions throughout the app.
-- **Responsive Design**: Fully functional on mobile with a dedicated bottom navigation bar.
 
 ---
 
