@@ -108,7 +108,7 @@ const DebtModal = ({ isOpen, onClose, initialData, onSubmit, onDelete }) => {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Amount Lent</label>
                             <div className="relative">
-                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
+                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-700" />
                                 <input
                                     type="text"
                                     required
@@ -122,7 +122,7 @@ const DebtModal = ({ isOpen, onClose, initialData, onSubmit, onDelete }) => {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Repaid</label>
                             <div className="relative">
-                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
+                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-700" />
                                 <input
                                     type="text"
                                     value={formData.amountRepaid}
@@ -150,7 +150,7 @@ const DebtModal = ({ isOpen, onClose, initialData, onSubmit, onDelete }) => {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Reminder</label>
                             <div className="relative">
-                                <Bell className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500" />
+                                <Bell className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-600" />
                                 <input
                                     type="datetime-local"
                                     value={formData.reminderDate}
@@ -179,7 +179,7 @@ const DebtModal = ({ isOpen, onClose, initialData, onSubmit, onDelete }) => {
                             <button
                                 type="button"
                                 onClick={handleDelete}
-                                className="px-6 py-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl font-bold transition-all"
+                                className="px-6 py-3 bg-red-500/10 text-red-700 hover:bg-red-600 hover:text-white rounded-xl font-bold transition-all"
                             >
                                 <Trash2 className="w-5 h-5" />
                             </button>

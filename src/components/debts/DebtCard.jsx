@@ -53,9 +53,9 @@ const DebtCard = ({ debt, deal, onClick }) => {
             {/* Status Indicator Strip */}
             <div className={cn(
                 "absolute left-0 top-0 bottom-0 w-1",
-                item.status === 'lent' && "bg-red-500",
-                item.status === 'partial' && "bg-yellow-500",
-                item.status === 'repaid' && "bg-green-500"
+                item.status === 'lent' && "bg-red-700",
+                item.status === 'partial' && "bg-yellow-600",
+                item.status === 'repaid' && "bg-emerald-700"
             )} />
 
             <div className="pl-3">
@@ -77,7 +77,7 @@ const DebtCard = ({ debt, deal, onClick }) => {
 
                 <div className="space-y-2">
                     <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg">
-                        <div className="flex items-center gap-2 text-red-500">
+                        <div className="flex items-center gap-2 text-red-700">
                             <DollarSign className="w-4 h-4" />
                             <span className="font-bold font-mono">{item.amount_lent}</span>
                         </div>
@@ -85,7 +85,7 @@ const DebtCard = ({ debt, deal, onClick }) => {
                     </div>
 
                     <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg">
-                        <div className="flex items-center gap-2 text-green-500">
+                        <div className="flex items-center gap-2 text-emerald-700">
                             <DollarSign className="w-4 h-4" />
                             <span className="font-bold font-mono">{item.amount_repaid}</span>
                         </div>
@@ -98,7 +98,7 @@ const DebtCard = ({ debt, deal, onClick }) => {
                             <span>{dateLent}</span>
                         </div>
                         {reminderDate && (
-                            <div className="flex items-center gap-1.5 text-xs text-orange-500 font-medium">
+                            <div className="flex items-center gap-1.5 text-xs text-yellow-600 font-medium">
                                 <AlertCircle className="w-3.5 h-3.5" />
                                 <span>{reminderDate}</span>
                             </div>

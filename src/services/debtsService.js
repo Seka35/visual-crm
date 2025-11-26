@@ -27,19 +27,19 @@ export const getDebts = async (workflowId) => {
             lent: {
                 id: 'lent',
                 title: 'MONEY LENT',
-                color: 'bg-red-500',
+                color: 'bg-red-700',
                 items: []
             },
             partial: {
                 id: 'partial',
                 title: 'PARTIALLY REPAID',
-                color: 'bg-yellow-500',
+                color: 'bg-yellow-600',
                 items: []
             },
             repaid: {
                 id: 'repaid',
                 title: 'FULLY REPAID',
-                color: 'bg-green-500',
+                color: 'bg-emerald-700',
                 items: []
             }
         };

@@ -69,6 +69,9 @@ const Debts = () => {
                 moveDebt(movedDebt.id, overContainer);
             }
 
+            // Update the status of the moved item locally
+            const updatedActiveItem = { ...activeItems[activeIndex], status: overContainer === 'lent' ? 'lent' : overContainer === 'partial' ? 'partial' : 'repaid' };
+
             return {
                 ...prev,
                 [activeContainer]: {
@@ -81,7 +84,7 @@ const Debts = () => {
                     ...prev[overContainer],
                     items: [
                         ...prev[overContainer].items.slice(0, newIndex),
-                        activeItems[activeIndex],
+                        updatedActiveItem,
                         ...prev[overContainer].items.slice(newIndex, prev[overContainer].items.length),
                     ],
                 },

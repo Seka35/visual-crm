@@ -51,9 +51,9 @@ export const CRMProvider = ({ children }) => {
 
     // --- Debts State ---
     const [debts, setDebts] = useState({
-        lent: { id: 'lent', title: 'MONEY LENT', color: 'bg-red-500', items: [] },
-        partial: { id: 'partial', title: 'PARTIALLY REPAID', color: 'bg-yellow-500', items: [] },
-        repaid: { id: 'repaid', title: 'FULLY REPAID', color: 'bg-green-500', items: [] }
+        lent: { id: 'lent', title: 'MONEY LENT', color: 'bg-red-700', items: [] },
+        partial: { id: 'partial', title: 'PARTIALLY REPAID', color: 'bg-yellow-600', items: [] },
+        repaid: { id: 'repaid', title: 'FULLY REPAID', color: 'bg-emerald-700', items: [] }
     });
 
     // --- Auth Effects ---
