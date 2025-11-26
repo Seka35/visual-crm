@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Briefcase, CheckSquare, Calendar, Sparkles, BarChart2 } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, CheckSquare, Calendar, Skull, BarChart2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 import { useWorkflow } from '../context/WorkflowContext';
@@ -51,7 +51,7 @@ const MobileNav = ({ onOpenAI }) => {
                     onClick={onOpenAI}
                     className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full shadow-lg shadow-orange-500/30 flex items-center justify-center text-white hover:scale-110 transition-transform ring-4 ring-slate-50 dark:ring-slate-900"
                 >
-                    <Sparkles className="w-6 h-6 animate-pulse" />
+                    <Skull className="w-8 h-8 animate-pulse" />
                 </button>
             </div>
 

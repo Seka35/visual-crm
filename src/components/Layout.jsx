@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
+import { Skull } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import AIChat from './AIChat';
@@ -55,7 +55,7 @@ const Layout = () => {
                     onClick={() => setIsAIChatOpen(true)}
                     className="hidden md:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full shadow-lg shadow-orange-500/30 items-center justify-center text-white hover:scale-110 transition-transform z-50 group"
                 >
-                    <Sparkles className="w-6 h-6 group-hover:animate-pulse" />
+                    <Skull className="w-8 h-8 group-hover:animate-pulse" />
                 </button>
             )}
         </div>
