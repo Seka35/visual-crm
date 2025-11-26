@@ -7,6 +7,8 @@ import EditProfileModal from '../components/EditProfileModal';
 import AccountSettings from './AccountSettings';
 import HelpSupport from './HelpSupport';
 
+import Reports from './Reports';
+
 const Profile = () => {
     const { user } = useCRM();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -64,6 +66,16 @@ const Profile = () => {
                 >
                     OPERATIONS
                     {activeTab === 'workflows' && (
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+                    )}
+                </button>
+                <button
+                    onClick={() => handleTabChange('ledger')}
+                    className={`px-6 py-4 text-lg font-medium transition-colors relative whitespace-nowrap font-gta tracking-wide ${activeTab === 'ledger' ? 'text-primary' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                        }`}
+                >
+                    LEDGER
+                    {activeTab === 'ledger' && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                     )}
                 </button>
@@ -192,6 +204,10 @@ const Profile = () => {
 
             {activeTab === 'workflows' && (
                 <WorkflowManager />
+            )}
+
+            {activeTab === 'ledger' && (
+                <Reports />
             )}
 
             {activeTab === 'settings' && (
