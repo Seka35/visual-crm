@@ -149,7 +149,7 @@ const Deals = () => {
     };
 
     return (
-        <div className="h-full md:h-[calc(100vh-8rem)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
                     <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">BIG SCORES</h2>
@@ -187,8 +187,8 @@ const Deals = () => {
                 onDragOver={handleDragOver}
                 onDragEnd={handleDragEnd}
             >
-                <div className="flex-1 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-4">
-                    <div className="grid grid-cols-2 md:flex md:flex-row gap-6 h-full md:min-w-fit px-1">
+                <div className="flex-1 pb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full px-1">
                         {Object.values(columns).map((col) => (
                             <KanbanColumn
                                 key={col.id}

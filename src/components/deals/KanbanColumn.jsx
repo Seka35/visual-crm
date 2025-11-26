@@ -10,7 +10,7 @@ const KanbanColumn = ({ id, title, count, total, color, deals, onDealClick, Card
     });
 
     return (
-        <div className="flex flex-col h-full w-full md:min-w-[300px] md:w-[300px]">
+        <div className="flex flex-col w-full min-w-0">
             <div className="flex justify-between items-center mb-4 px-1">
                 <div className="flex items-center gap-2">
                     <div className={cn("w-3 h-3 rounded-full", color)} />
@@ -37,7 +37,7 @@ const KanbanColumn = ({ id, title, count, total, color, deals, onDealClick, Card
             <div
                 ref={setNodeRef}
                 className={cn(
-                    "flex-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl p-3 space-y-3 transition-colors overflow-y-auto min-h-0 no-scrollbar",
+                    "flex-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl p-3 pb-4 space-y-3 transition-colors min-h-[150px]",
                     isOver && "bg-primary/5 ring-2 ring-primary/20"
                 )}
             >
