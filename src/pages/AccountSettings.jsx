@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Lock, Bell, Trash2, Save, Shield } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 import { supabase } from '../lib/supabaseClient';
+import * as authService from '../services/authService';
 
 const AccountSettings = () => {
     const { user } = useCRM();
@@ -10,6 +11,36 @@ const AccountSettings = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
+    const [ntfyUrl, setNtfyUrl] = useState('');
+    const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+    React.useEffect(() => {
+        if (user) {
+            authService.getUserProfile(user.id).then(({ data }) => {
+                if (data) {
+                    setNtfyUrl(data.ntfy_url || '');
+                    if (data.timezone) setTimezone(data.timezone);
+                }
+            });
+        }
+    }, [user]);
+
+    const handleUpdateNtfy = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const { error } = await authService.updateUserProfile(user.id, {
+                ntfy_url: ntfyUrl,
+                timezone: timezone
+            });
+            if (error) throw error;
+            setMessage({ type: 'success', text: 'Notification settings updated!' });
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
@@ -93,6 +124,78 @@ const AccountSettings = () => {
                     >
                         <Save className="w-5 h-5" />
                         <span>CONFIRM CHANGES</span>
+                    </button>
+                </form>
+            </div>
+
+            {/* Notification Settings */}
+            <div className="glass-card p-6 rounded-2xl space-y-6">
+                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-4">
+                    <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500">
+                        <Bell className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold font-gta text-slate-800 dark:text-white tracking-wide">NOTIFICATIONS</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Personal workspace reminders</p>
+                    </div>
+                </div>
+
+                <form onSubmit={handleUpdateNtfy} className="space-y-4">
+                    <div>
+                        <label className="block text-slate-700 dark:text-slate-300 mb-2 font-medium">ntfy.sh Topic URL</label>
+                        <input
+                            type="text"
+                            value={ntfyUrl}
+                            onChange={(e) => setNtfyUrl(e.target.value)}
+                            placeholder="ntfy.sh/my-personal-topic"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-slate-800 dark:text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-slate-700 dark:text-slate-300 mb-2 font-medium">Timezone</label>
+                        <select
+                            value={timezone}
+                            onChange={(e) => setTimezone(e.target.value)}
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-slate-800 dark:text-white"
+                        >
+                            <option value="UTC">UTC (Universal Time)</option>
+                            <optgroup label="Europe & Africa">
+                                <option value="Europe/London">London (UTC+0)</option>
+                                <option value="Europe/Paris">Paris (UTC+1)</option>
+                                <option value="Africa/Dar_es_Salaam">Zanzibar (UTC+3)</option>
+                            </optgroup>
+                            <optgroup label="Asia & Oceania">
+                                <option value="Asia/Dubai">Dubai (UTC+4)</option>
+                                <option value="Asia/Bangkok">Bangkok (UTC+7)</option>
+                                <option value="Asia/Singapore">Singapore (UTC+8)</option>
+                                <option value="Asia/Kuala_Lumpur">Kuala Lumpur (UTC+8)</option>
+                                <option value="Asia/Makassar">Bali (UTC+8)</option>
+                                <option value="Australia/Sydney">Sydney (UTC+11)</option>
+                            </optgroup>
+                            <optgroup label="Americas">
+                                <option value="America/Sao_Paulo">Sao Paulo (UTC-3)</option>
+                                <option value="America/New_York">New York (UTC-5)</option>
+                                <option value="America/Los_Angeles">Los Angeles (UTC-8)</option>
+                            </optgroup>
+
+                            {/* Fallback for current detected if not in list */}
+                            {!["UTC", "Europe/London", "Europe/Paris", "Africa/Dar_es_Salaam", "Asia/Dubai", "Asia/Bangkok", "Asia/Singapore", "Asia/Kuala_Lumpur", "Asia/Makassar", "Australia/Sydney", "America/Sao_Paulo", "America/New_York", "America/Los_Angeles"].includes(timezone) && (
+                                <option value={timezone}>{timezone} (Detected)</option>
+                            )}
+                        </select>
+                        <p className="text-xs text-slate-400 mt-2">
+                            Ensure this matches your local time for correct reminders.
+                        </p>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors disabled:opacity-50 uppercase tracking-wide"
+                    >
+                        <Save className="w-5 h-5" />
+                        <span>SAVE SETTINGS</span>
                     </button>
                 </form>
             </div>

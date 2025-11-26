@@ -38,6 +38,7 @@ export const getTasks = async (workflowId = null) => {
             description: task.description,
             date: task.date,
             dueDate: task.due_date,
+            reminderTime: task.reminder_time,
             priority: task.priority,
             project: task.project,
             assigneeAvatar: task.users?.avatar_url || task.assignee_avatar,
@@ -74,7 +75,6 @@ export const getTask = async (id) => {
 };
 
 // Add a new task
-// Add a new task
 export const addTask = async (task, workflowId = null) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -87,6 +87,7 @@ export const addTask = async (task, workflowId = null) => {
             description: task.description || '',
             date: task.date || 'Today',
             due_date: task.dueDate || null,
+            reminder_time: task.reminderTime || null,
             priority: task.priority || 'medium',
             project: task.project || 'General',
             assignee_avatar: task.assigneeAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
@@ -110,6 +111,7 @@ export const addTask = async (task, workflowId = null) => {
             description: data.description,
             date: data.date,
             dueDate: data.due_date,
+            reminderTime: data.reminder_time,
             priority: data.priority,
             project: data.project,
             assigneeAvatar: data.assignee_avatar,
@@ -134,6 +136,7 @@ export const updateTask = async (id, updates) => {
         if (updates.description !== undefined) dbUpdates.description = updates.description;
         if (updates.date !== undefined) dbUpdates.date = updates.date;
         if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
+        if (updates.reminderTime !== undefined) dbUpdates.reminder_time = updates.reminderTime;
         if (updates.priority !== undefined) dbUpdates.priority = updates.priority;
         if (updates.project !== undefined) dbUpdates.project = updates.project;
         if (updates.assigneeAvatar !== undefined) dbUpdates.assignee_avatar = updates.assigneeAvatar;
@@ -157,6 +160,7 @@ export const updateTask = async (id, updates) => {
             description: data.description,
             date: data.date,
             dueDate: data.due_date,
+            reminderTime: data.reminder_time,
             priority: data.priority,
             project: data.project,
             assigneeAvatar: data.assignee_avatar,

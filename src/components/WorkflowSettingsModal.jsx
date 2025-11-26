@@ -11,12 +11,17 @@ const WorkflowSettingsModal = ({ isOpen, onClose, workflow }) => {
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
+    const [ntfyUrl, setNtfyUrl] = useState('');
+    const [saving, setSaving] = useState(false);
 
     const targetWorkflow = workflow || activeWorkflow;
 
     useEffect(() => {
         if (isOpen && targetWorkflow) {
-            loadMembers();
+            if (isOpen && targetWorkflow) {
+                loadMembers();
+                setNtfyUrl(targetWorkflow.ntfy_url || '');
+            }
         }
     }, [isOpen, targetWorkflow]);
 
@@ -36,6 +41,17 @@ const WorkflowSettingsModal = ({ isOpen, onClose, workflow }) => {
     const handleDelete = async () => {
         await deleteWorkflow(targetWorkflow.id);
         onClose();
+    };
+
+    const handleSaveSettings = async () => {
+        setSaving(true);
+        const { error } = await workflowService.updateWorkflow(targetWorkflow.id, { ntfy_url: ntfyUrl });
+        setSaving(false);
+        if (!error) {
+            // Optional: Show success message
+            onClose();
+            window.location.reload(); // Simple reload to refresh context for now
+        }
     };
 
     if (!isOpen || !targetWorkflow) return null;
@@ -70,6 +86,30 @@ const WorkflowSettingsModal = ({ isOpen, onClose, workflow }) => {
                             {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5 text-slate-400 dark:text-slate-300" />}
                         </button>
                     </div>
+                </div>
+
+                {/* Notification Settings */}
+                <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Notifications (ntfy.sh)</p>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={ntfyUrl}
+                            onChange={(e) => setNtfyUrl(e.target.value)}
+                            placeholder="ntfy.sh/topic"
+                            className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary"
+                        />
+                        <button
+                            onClick={handleSaveSettings}
+                            disabled={saving}
+                            className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 disabled:opacity-50"
+                        >
+                            {saving ? 'Saving...' : 'Save'}
+                        </button>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2">
+                        Enter your ntfy.sh topic URL to receive reminders for tasks and events in this workflow.
+                    </p>
                 </div>
 
                 {/* Members List */}

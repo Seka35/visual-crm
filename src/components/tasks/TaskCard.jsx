@@ -40,6 +40,11 @@ const TaskCard = ({ task, onToggle, onEdit }) => {
                                     year: new Date(task.dueDate).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
                                 })
                                 : 'No date'}
+                            {task.reminderTime && (
+                                <span className="ml-1 opacity-70">
+                                    • {task.reminderTime.slice(0, 5)}
+                                </span>
+                            )}
                         </span>
                     </div>
                     {task.project && (

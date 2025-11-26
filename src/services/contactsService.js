@@ -79,7 +79,7 @@ export const addContact = async (contact, workflowId = null) => {
             phone: contact.phone || '',
             status: contact.status || 'New',
             last_contact: contact.lastContact || 'Just now',
-            avatar: contact.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.name}`,
+            avatar: contact.avatar || null,
             tags: contact.tags || ['New'],
             notes: contact.notes || ''
         };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Phone, Mail, Building, Star, MoreHorizontal } from 'lucide-react';
+import crewImage from '../../assets/crew.webp';
 
 const ContactCard = ({ contact }) => {
     return (
@@ -13,9 +14,9 @@ const ContactCard = ({ contact }) => {
             <div className="flex flex-col items-center text-center mb-4">
                 <div className="relative mb-3">
                     <img
-                        src={contact.avatar}
+                        src={contact.avatar || crewImage}
                         alt={contact.name}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+                        className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md bg-slate-100"
                     />
                     <span className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${contact.status === 'online' ? 'bg-success' : 'bg-slate-300'
                         }`} />

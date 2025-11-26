@@ -31,7 +31,7 @@ const PipelineWidget = ({ deals = {} }) => {
         const stageDeals = deals[stageName]?.items || [];
         const count = stageDeals.length;
         const amount = stageDeals.reduce((acc, deal) => {
-            return acc + parseFloat(deal.amount?.replace(/[^0-9.-]+/g, "") || 0);
+            return acc + parseInt(deal.amount?.replace(/[^0-9]/g, "") || 0);
         }, 0);
 
         // Calculate percentage based on actual deal count

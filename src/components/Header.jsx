@@ -42,7 +42,7 @@ const Header = ({ onMenuClick }) => {
     const wonDeals = deals?.won?.items || [];
     const totalRevenue = wonDeals.reduce((sum, deal) => {
         const amountString = deal.amount || '0';
-        const amountValue = parseFloat(amountString.replace(/[^0-9.-]+/g, '')) || 0;
+        const amountValue = parseInt(amountString.replace(/[^0-9]/g, '')) || 0;
         return sum + amountValue;
     }, 0);
     const formattedRevenue = new Intl.NumberFormat('en-US', {

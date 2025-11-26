@@ -154,3 +154,13 @@ export const markNotificationRead = async (id) => {
         .eq('id', id);
     return { data, error };
 };
+
+export const updateWorkflow = async (id, updates) => {
+    const { data, error } = await supabase
+        .from('workflows')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+    return { data, error };
+};

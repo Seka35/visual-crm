@@ -24,23 +24,20 @@
 - **Visual Feedback**: Smooth animations and color-coded stages.
 - **Quick Actions**: Add, edit, or delete deals on the fly.
 
+### 🔔 Notifications & Reminders
+- **Ntfy Integration**: Receive real-time notifications on your phone or desktop via `ntfy.sh`.
+- **Task Reminders**: Set specific times for your tasks and get notified when they are due.
+- **Workflow Alerts**: Get notified about important workflow updates.
+
 ### 👥 Contact Management
 - **Centralized Database**: Store all your contacts with details like Company, Role, Email, and Phone.
+- **Smart Avatars**: Automatically assigns a default "Crew" image if none is provided.
+- **Image Upload**: Upload custom profile pictures directly to Supabase storage.
 - **Search & Filter**: Instantly find who you're looking for.
 - **Direct Actions**: Call or email directly from the contact card.
 
-### ✅ Task Management
-- **Priority System**: High, Medium, and Low priority tasks with color-coded badges.
-- **Status Tracking**: Mark tasks as complete with a satisfying click.
-- **Due Dates**: Never miss a deadline.
-
-### 📅 Calendar & Events
-- **Integrated Schedule**: View all your meetings and calls in a clean calendar view.
-- **Event Types**: Distinguish between Meetings, Calls, Deadlines, and Personal events.
-- **Upcoming Widget**: See your daily schedule right on the dashboard.
-
 ### 📈 Reports & Analytics
-- **Revenue Charts**: Visual breakdown of revenue over time.
+- **Revenue Charts**: Visual breakdown of revenue over time (now with fixed calculation logic!).
 - **Pipeline Analysis**: Detailed charts showing deal distribution and conversion rates.
 
 ---

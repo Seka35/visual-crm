@@ -4,7 +4,7 @@ import { MoreHorizontal, Plus } from 'lucide-react';
 import DealCard from './DealCard';
 import { cn } from '../../lib/utils';
 
-const KanbanColumn = ({ id, title, count, total, color, deals }) => {
+const KanbanColumn = ({ id, title, count, total, color, deals, onDealClick }) => {
     const { setNodeRef, isOver } = useDroppable({
         id: id,
     });
@@ -37,12 +37,12 @@ const KanbanColumn = ({ id, title, count, total, color, deals }) => {
             <div
                 ref={setNodeRef}
                 className={cn(
-                    "flex-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl p-3 space-y-3 transition-colors",
+                    "flex-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl p-3 space-y-3 transition-colors overflow-y-auto min-h-0 no-scrollbar",
                     isOver && "bg-primary/5 ring-2 ring-primary/20"
                 )}
             >
                 {deals.map((deal) => (
-                    <DealCard key={deal.id} deal={deal} onClick={() => onDealClick(deal)} />
+                    <DealCard key={deal.id} deal={deal} onClick={() => onDealClick && onDealClick(deal)} />
                 ))}
                 {deals.length === 0 && (
                     <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-slate-400 text-sm font-medium">

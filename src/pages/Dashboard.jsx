@@ -59,7 +59,7 @@ const Dashboard = () => {
     const allDeals = Object.values(deals).flatMap(column => column.items || []);
 
     const totalRevenue = (deals.won?.items || []).reduce((acc, deal) => {
-        const amount = parseFloat(deal.amount?.replace(/[^0-9.-]+/g, "") || 0);
+        const amount = parseInt(deal.amount?.replace(/[^0-9]/g, "") || 0);
         return acc + amount;
     }, 0);
 

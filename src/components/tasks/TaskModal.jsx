@@ -5,8 +5,10 @@ const TaskModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
     const [formData, setFormData] = useState({
         title: '',
         dueDate: '',
-        priority: 'medium'
+        priority: 'medium',
+        reminderTime: ''
     });
+    const [showReminderInput, setShowReminderInput] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -14,14 +16,20 @@ const TaskModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
             setFormData({
                 title: initialData.title || '',
                 dueDate: initialData.dueDate || '',
-                priority: initialData.priority || 'medium'
+                priority: initialData.priority || 'medium',
+                reminderTime: initialData.reminderTime || ''
             });
+            if (initialData.reminderTime) {
+                setShowReminderInput(true);
+            }
         } else {
             setFormData({
                 title: '',
                 dueDate: '',
-                priority: 'medium'
+                priority: 'medium',
+                reminderTime: ''
             });
+            setShowReminderInput(false);
         }
     }, [initialData, isOpen]);
 
@@ -44,6 +52,7 @@ const TaskModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 title: formData.title,
                 dueDate: formData.dueDate,
                 priority: formData.priority,
+                reminderTime: formData.reminderTime,
                 completed: initialData ? initialData.completed : false
             };
             await onSubmit(taskData);
@@ -123,10 +132,40 @@ const TaskModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                                 <Link className="w-4 h-4" />
                                 <span>Link Deal</span>
                             </button>
-                            <button type="button" className="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center gap-2 transition-colors">
-                                <Bell className="w-4 h-4" />
-                                <span>Set Reminder</span>
-                            </button>
+
+                            <div className="flex-1 relative">
+                                {!showReminderInput ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowReminderInput(true)}
+                                        className="w-full py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center gap-2 transition-colors"
+                                    >
+                                        <Bell className="w-4 h-4" />
+                                        <span>Set Reminder</span>
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center gap-2 w-full">
+                                        <input
+                                            type="time"
+                                            name="reminderTime"
+                                            value={formData.reminderTime}
+                                            onChange={handleChange}
+                                            className="flex-1 py-3 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
+                                            autoFocus
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowReminderInput(false);
+                                                setFormData(prev => ({ ...prev, reminderTime: '' }));
+                                            }}
+                                            className="p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-red-500 transition-colors"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
