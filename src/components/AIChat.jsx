@@ -446,8 +446,8 @@ const AIChat = ({ isOpen, onClose }) => {
                         properties: {
                             page: {
                                 type: "string",
-                                enum: ["dashboard", "contacts", "deals", "tasks", "calendar", "reports", "profile", "settings", "debts"],
-                                description: "Page to navigate to"
+                                enum: ["dashboard", "contacts", "deals", "tasks", "calendar", "reports", "profile", "settings", "debts", "plan", "missions", "scores", "crew"],
+                                description: "Page to navigate to. Aliases: 'plan' (Calendar), 'missions' (Tasks), 'scores' (Deals), 'crew' (Contacts)"
                             }
                         },
                         required: ["page"]
@@ -879,14 +879,14 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                         const page = functionArgs.page;
                         switch (page) {
                             case 'dashboard': navigate('/'); break;
-                            case 'contacts': navigate('/contacts'); break;
-                            case 'deals': navigate('/deals'); break;
-                            case 'tasks': navigate('/tasks'); break;
-                            case 'calendar': navigate('/calendar'); break;
+                            case 'contacts': case 'crew': navigate('/contacts'); break;
+                            case 'deals': case 'scores': navigate('/deals'); break;
+                            case 'tasks': case 'missions': navigate('/tasks'); break;
+                            case 'calendar': case 'plan': navigate('/calendar'); break;
                             case 'reports': navigate('/reports'); break;
                             case 'profile': navigate('/profile?tab=profile'); break;
                             case 'settings': navigate('/profile?tab=settings'); break;
-                            case 'debts': navigate('/profile?tab=ledger'); break;
+                            case 'debts': navigate('/debts'); break;
                             default: navigate('/');
                         }
                         actionResult = `Navigated to ${page}`;
