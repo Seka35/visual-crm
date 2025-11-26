@@ -91,7 +91,9 @@ export const updateDebt = async (id, updates) => {
         if (updates.amountLent !== undefined) dbUpdates.amount_lent = updates.amountLent;
         if (updates.amountRepaid !== undefined) dbUpdates.amount_repaid = updates.amountRepaid;
         if (updates.dateLent !== undefined) dbUpdates.date_lent = updates.dateLent;
-        if (updates.reminderDate !== undefined) dbUpdates.reminder_date = updates.reminderDate;
+        if (updates.reminderDate !== undefined) {
+            dbUpdates.reminder_date = updates.reminderDate || null;
+        }
         if (updates.description !== undefined) dbUpdates.description = updates.description;
         if (updates.status !== undefined) dbUpdates.status = updates.status;
 

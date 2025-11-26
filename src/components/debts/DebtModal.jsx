@@ -37,12 +37,21 @@ const DebtModal = ({ isOpen, onClose, initialData, onSubmit, onDelete }) => {
         }
     }, [initialData, isOpen]);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit(formData);
-        onClose();
+        setIsSubmitting(true);
+        try {
+            await onSubmit(formData);
+            onClose();
+        } catch (error) {
+            console.error("Error submitting form:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleDelete = () => {
@@ -179,7 +188,7 @@ const DebtModal = ({ isOpen, onClose, initialData, onSubmit, onDelete }) => {
                             type="submit"
                             className="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98] font-gta tracking-wide text-lg"
                         >
-                            {initialData ? 'SAVE CHANGES' : 'ADD DEBT'}
+                            {isSubmitting ? 'SAVING...' : (initialData ? 'SAVE CHANGES' : 'ADD DEBT')}
                         </button>
                     </div>
                 </form>

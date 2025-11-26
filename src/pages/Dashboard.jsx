@@ -5,13 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import WelcomeCard from '../components/dashboard/WelcomeCard';
 import KPICards from '../components/dashboard/KPICards';
 import PipelineWidget from '../components/dashboard/PipelineWidget';
+import DebtPipelineWidget from '../components/dashboard/DebtPipelineWidget';
 import FunDashboard from '../components/dashboard/FunDashboard';
 import SortableItem from '../components/dashboard/SortableItem';
 import { Clock, Calendar, ArrowRight, Sparkles, GripVertical } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 
 const Dashboard = () => {
-    const { user, deals, tasks, events } = useCRM();
+    const { user, deals, debts, tasks, events } = useCRM();
     const navigate = useNavigate();
     const [funMode, setFunMode] = useState(false);
 
@@ -20,6 +21,7 @@ const Dashboard = () => {
         'welcome',
         'kpi',
         'pipeline',
+        'debtPipeline',
         'schedule'
     ]);
 
@@ -95,6 +97,8 @@ const Dashboard = () => {
                 />;
             case 'pipeline':
                 return <PipelineWidget deals={deals} />;
+            case 'debtPipeline':
+                return <DebtPipelineWidget debts={debts} />;
 
             case 'schedule':
                 return (
@@ -132,6 +136,7 @@ const Dashboard = () => {
             case 'welcome': return 'col-span-1 md:col-span-2 lg:col-span-4';
             case 'kpi': return 'col-span-1 md:col-span-2 lg:col-span-4';
             case 'pipeline': return 'col-span-1 md:col-span-2 lg:col-span-3';
+            case 'debtPipeline': return 'col-span-1 md:col-span-2 lg:col-span-3';
 
             case 'schedule': return 'col-span-1 md:col-span-1 lg:col-span-1';
             default: return 'col-span-1';
