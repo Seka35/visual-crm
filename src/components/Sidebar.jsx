@@ -4,6 +4,7 @@ import { LayoutDashboard, Users, Briefcase, CheckSquare, BarChart2, Calendar, Se
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabaseClient';
 
+import { useWorkflow } from '../context/WorkflowContext';
 import { useTheme } from '../context/ThemeContext';
 import logoWhite from '../assets/logo_white.png';
 import logoBlack from '../assets/logo_black.png';
@@ -11,20 +12,27 @@ import logoBlack from '../assets/logo_black.png';
 const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => {
     const { theme } = useTheme();
     const navigate = useNavigate();
+    const { currentWorkflow } = useWorkflow();
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/login');
     };
 
-    const navItems = [
-        { icon: LayoutDashboard, label: 'DASHBOARD', path: '/' },
-        { icon: Users, label: 'THE CREW', path: '/contacts' },
-        { icon: Briefcase, label: 'BIG SCORES', path: '/deals' },
-        { icon: CheckSquare, label: 'MISSIONS', path: '/tasks' },
-        { icon: Calendar, label: 'THE PLAN', path: '/calendar' },
-        { icon: BarChart2, label: 'THE DEPTS', path: '/debts' },
+    const allNavItems = [
+        { icon: LayoutDashboard, label: 'DASHBOARD', path: '/', resource: null }, // Always visible
+        { icon: Users, label: 'THE CREW', path: '/contacts', resource: 'contacts' },
+        { icon: Briefcase, label: 'BIG SCORES', path: '/deals', resource: 'deals' },
+        { icon: CheckSquare, label: 'MISSIONS', path: '/tasks', resource: 'tasks' },
+        { icon: Calendar, label: 'THE PLAN', path: '/calendar', resource: 'calendar' },
+        { icon: BarChart2, label: 'THE DEPTS', path: '/debts', resource: 'debts' },
     ];
+
+    const navItems = allNavItems.filter(item => {
+        if (!currentWorkflow) return true; // Personal workflow has access to everything
+        if (!item.resource) return true; // Dashboard is always visible
+        return currentWorkflow.shared_resources?.includes(item.resource);
+    });
 
     return (
         <>

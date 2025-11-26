@@ -5,25 +5,34 @@ import { X, Trash2, User, Shield, Copy, Check } from 'lucide-react';
 import * as workflowService from '../services/workflowService';
 
 const WorkflowSettingsModal = ({ isOpen, onClose, workflow }) => {
-    const { currentWorkflow: activeWorkflow, deleteWorkflow } = useWorkflow();
+    const { currentWorkflow: activeWorkflow, deleteWorkflow, updateWorkflow } = useWorkflow();
     const { user } = useCRM();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [ntfyUrl, setNtfyUrl] = useState('');
+    const [selectedResources, setSelectedResources] = useState([]);
     const [saving, setSaving] = useState(false);
 
     const targetWorkflow = workflow || activeWorkflow;
 
     useEffect(() => {
         if (isOpen && targetWorkflow) {
-            if (isOpen && targetWorkflow) {
-                loadMembers();
-                setNtfyUrl(targetWorkflow.ntfy_url || '');
-            }
+            loadMembers();
+            setNtfyUrl(targetWorkflow.ntfy_url || '');
+            setSelectedResources(targetWorkflow.shared_resources || []);
         }
     }, [isOpen, targetWorkflow]);
+
+    const toggleResource = (resource) => {
+        const id = resource.toLowerCase();
+        if (selectedResources.includes(id)) {
+            setSelectedResources(selectedResources.filter(r => r !== id));
+        } else {
+            setSelectedResources([...selectedResources, id]);
+        }
+    };
 
     const loadMembers = async () => {
         setLoading(true);
@@ -45,12 +54,14 @@ const WorkflowSettingsModal = ({ isOpen, onClose, workflow }) => {
 
     const handleSaveSettings = async () => {
         setSaving(true);
-        const { error } = await workflowService.updateWorkflow(targetWorkflow.id, { ntfy_url: ntfyUrl });
+        const { error } = await updateWorkflow(targetWorkflow.id, {
+            ntfy_url: ntfyUrl,
+            shared_resources: selectedResources
+        });
         setSaving(false);
         if (!error) {
-            // Optional: Show success message
             onClose();
-            window.location.reload(); // Simple reload to refresh context for now
+            // Context update handles the refresh
         }
     };
 
@@ -97,20 +108,46 @@ const WorkflowSettingsModal = ({ isOpen, onClose, workflow }) => {
                             value={ntfyUrl}
                             onChange={(e) => setNtfyUrl(e.target.value)}
                             placeholder="ntfy.sh/topic"
-                            className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary"
+                            className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary dark:text-white"
                         />
-                        <button
-                            onClick={handleSaveSettings}
-                            disabled={saving}
-                            className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 disabled:opacity-50"
-                        >
-                            {saving ? 'Saving...' : 'Save'}
-                        </button>
                     </div>
                     <p className="text-xs text-slate-400 mt-2">
                         Enter your ntfy.sh topic URL to receive reminders for tasks and events in this workflow.
                     </p>
                 </div>
+
+                {/* Shared Resources Settings (Admin Only) */}
+                {isCreator && (
+                    <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Shared Resources</p>
+                        <div className="flex flex-wrap gap-2">
+                            {['Contacts', 'Deals', 'Tasks', 'Calendar', 'Debts'].map(resource => {
+                                const id = resource.toLowerCase();
+                                const isSelected = selectedResources.includes(id);
+                                return (
+                                    <button
+                                        key={resource}
+                                        onClick={() => toggleResource(resource)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${isSelected
+                                            ? 'bg-primary text-white border-primary'
+                                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                                            }`}
+                                    >
+                                        {resource}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                <button
+                    onClick={handleSaveSettings}
+                    disabled={saving}
+                    className="w-full mb-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 disabled:opacity-50 uppercase tracking-wide"
+                >
+                    {saving ? 'Saving Changes...' : 'Save Changes'}
+                </button>
 
                 {/* Members List */}
                 <div className="mb-6">

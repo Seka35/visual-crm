@@ -216,7 +216,7 @@ const WorkflowManager = () => {
                             <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Shared Resources</h4>
                             <p className="text-xs text-slate-500 mb-3">Select what the crew can access:</p>
                             <div className="flex flex-wrap gap-2">
-                                {['Contacts', 'Deals', 'Tasks', 'Calendar'].map(resource => {
+                                {['Contacts', 'Deals', 'Tasks', 'Calendar', 'Debts'].map(resource => {
                                     const id = resource.toLowerCase();
                                     const isSelected = selectedResources.includes(id);
                                     return (

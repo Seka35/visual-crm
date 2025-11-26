@@ -3,15 +3,25 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Briefcase, CheckSquare, Calendar, Sparkles, BarChart2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
+import { useWorkflow } from '../context/WorkflowContext';
+
 const MobileNav = ({ onOpenAI }) => {
-    const navItems = [
-        { icon: LayoutDashboard, label: 'Home', path: '/' },
-        { icon: Users, label: 'Contacts', path: '/contacts' },
-        { icon: Briefcase, label: 'Deals', path: '/deals' },
-        { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
-        { icon: Calendar, label: 'Calendar', path: '/calendar' },
-        { icon: BarChart2, label: 'Debts', path: '/debts' },
+    const { currentWorkflow } = useWorkflow();
+
+    const allNavItems = [
+        { icon: LayoutDashboard, label: 'Home', path: '/', resource: null },
+        { icon: Users, label: 'Contacts', path: '/contacts', resource: 'contacts' },
+        { icon: Briefcase, label: 'Deals', path: '/deals', resource: 'deals' },
+        { icon: CheckSquare, label: 'Tasks', path: '/tasks', resource: 'tasks' },
+        { icon: Calendar, label: 'Calendar', path: '/calendar', resource: 'calendar' },
+        { icon: BarChart2, label: 'Debts', path: '/debts', resource: 'debts' },
     ];
+
+    const navItems = allNavItems.filter(item => {
+        if (!currentWorkflow) return true;
+        if (!item.resource) return true;
+        return currentWorkflow.shared_resources?.includes(item.resource);
+    });
 
     // Split items to place AI button in middle (3 on left, 3 on right)
     const leftItems = navItems.slice(0, 3);

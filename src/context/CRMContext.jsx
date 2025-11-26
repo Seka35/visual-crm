@@ -352,7 +352,7 @@ export const CRMProvider = ({ children }) => {
 
     // --- Debts Functions ---
     const loadDebts = async () => {
-        const { data, error } = await debtsService.getDebts();
+        const { data, error } = await debtsService.getDebts(currentWorkflowId);
         if (error) {
             console.error('Error loading debts:', error);
             setError(error.message);
@@ -362,7 +362,7 @@ export const CRMProvider = ({ children }) => {
     };
 
     const addDebt = async (debt) => {
-        const { data, error } = await debtsService.addDebt(debt);
+        const { data, error } = await debtsService.addDebt(debt, currentWorkflowId);
         if (error) {
             console.error('Error adding debt:', error);
             setError(error.message);

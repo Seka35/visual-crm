@@ -85,6 +85,32 @@
 
 ---
 
+## 📱 Notifications Setup (ntfy.sh)
+
+Visual Auto CRM uses **ntfy.sh** for real-time notifications. Here is how to set it up for the first time:
+
+### 1. Create a Topic
+1.  Go to [ntfy.sh](https://ntfy.sh).
+2.  Choose a unique topic name (e.g., `visual-crm-tony-123`).
+    *   *Note: Topics are public, so choose something random/unique.*
+3.  This will be your topic URL: `ntfy.sh/visual-crm-tony-123`.
+
+### 2. Connect the App
+1.  Open **Visual Auto CRM**.
+2.  Go to **Settings** (Profile -> Settings).
+3.  Enter your topic URL (e.g., `ntfy.sh/visual-crm-tony-123`) in the **Notification URL** field.
+4.  Click **Save**.
+
+### 3. Receive Notifications
+*   **On Desktop**: Keep the ntfy.sh web page open or install the desktop app.
+*   **On Mobile**:
+    1.  Download the **ntfy** app (iOS/Android).
+    2.  Click the `+` button to subscribe.
+    3.  Enter your topic name (e.g., `visual-crm-tony-123`).
+    4.  You will now receive push notifications for task reminders and workflow alerts!
+
+---
+
 ## 🎨 UI/UX Highlights
 
 - **Glassmorphism**: Translucent cards with background blur for a modern, premium feel.

@@ -43,41 +43,47 @@ const KPICard = ({ title, value, icon: Icon, color, path }) => {
     );
 };
 
-const KPICards = ({ revenue = 0, activeDeals = 0, pendingTasks = 0, meetingsToday = 0 }) => {
+const KPICards = ({ revenue = 0, activeDeals = 0, pendingTasks = 0, meetingsToday = 0, hasAccess = () => true }) => {
     const kpis = [
         {
             title: "THE STASH",
             value: `$${revenue.toLocaleString()}`,
             icon: TrendingUp,
             color: "primary",
-            path: '/reports'
+            path: '/reports',
+            resource: 'deals'
         },
         {
             title: "ACTIVE HUSTLES",
             value: activeDeals.toString(),
             icon: BriefcaseIcon,
             color: "secondary",
-            path: '/deals'
+            path: '/deals',
+            resource: 'deals'
         },
         {
             title: "LOOSE ENDS",
             value: pendingTasks.toString(),
             icon: CheckCircle,
             color: "success",
-            path: '/tasks'
+            path: '/tasks',
+            resource: 'tasks'
         },
         {
             title: "SIT DOWNS",
             value: meetingsToday.toString(),
             icon: Calendar,
             color: "warning",
-            path: '/calendar'
+            path: '/calendar',
+            resource: 'calendar'
         }
     ];
 
+    const visibleKpis = kpis.filter(kpi => hasAccess(kpi.resource));
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {kpis.map((kpi, index) => (
+            {visibleKpis.map((kpi, index) => (
                 <KPICard key={index} {...kpi} />
             ))}
         </div>

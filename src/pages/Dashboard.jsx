@@ -11,10 +11,19 @@ import SortableItem from '../components/dashboard/SortableItem';
 import { Clock, Calendar, ArrowRight, Sparkles, GripVertical } from 'lucide-react';
 import { useCRM } from '../context/CRMContext';
 
+import { useWorkflow } from '../context/WorkflowContext';
+
 const Dashboard = () => {
     const { user, deals, debts, tasks, events } = useCRM();
+    const { currentWorkflow } = useWorkflow();
     const navigate = useNavigate();
     const [funMode, setFunMode] = useState(false);
+
+    // Helper to check resource access
+    const hasAccess = (resource) => {
+        if (!currentWorkflow) return true; // Personal workflow has access to everything
+        return currentWorkflow.shared_resources?.includes(resource);
+    };
 
     // Initial widget order
     const [items, setItems] = useState([
@@ -94,14 +103,15 @@ const Dashboard = () => {
                     activeDeals={activeDealsCount}
                     pendingTasks={pendingTasksCount}
                     meetingsToday={meetingsTodayCount}
+                    hasAccess={hasAccess}
                 />;
             case 'pipeline':
-                return <PipelineWidget deals={deals} />;
+                return hasAccess('deals') ? <PipelineWidget deals={deals} /> : null;
             case 'debtPipeline':
-                return <DebtPipelineWidget debts={debts} />;
+                return hasAccess('debts') ? <DebtPipelineWidget debts={debts} /> : null;
 
             case 'schedule':
-                return (
+                return hasAccess('calendar') ? (
                     <div className="glass-card p-6 rounded-2xl h-full cursor-pointer hover:-translate-y-1 transition-transform duration-300" onClick={() => navigate('/calendar')}>
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -125,7 +135,7 @@ const Dashboard = () => {
                             )}
                         </div>
                     </div>
-                );
+                ) : null;
             default:
                 return null;
         }

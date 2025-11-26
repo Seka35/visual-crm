@@ -94,6 +94,17 @@ export const WorkflowProvider = ({ children }) => {
         return { error };
     };
 
+    const updateWorkflow = async (id, updates) => {
+        const { data, error } = await workflowService.updateWorkflow(id, updates);
+        if (!error && data) {
+            setWorkflows(prev => prev.map(w => w.id === id ? data : w));
+            if (currentWorkflow?.id === id) {
+                setCurrentWorkflow(data);
+            }
+        }
+        return { data, error };
+    };
+
     return (
         <WorkflowContext.Provider value={{
             workflows,
@@ -105,7 +116,8 @@ export const WorkflowProvider = ({ children }) => {
             switchWorkflow,
             acceptJoinRequest,
             loadNotifications,
-            deleteWorkflow
+            deleteWorkflow,
+            updateWorkflow // Expose updateWorkflow
         }}>
             {children}
         </WorkflowContext.Provider>

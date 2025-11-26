@@ -5,13 +5,20 @@ import { supabase } from '../lib/supabaseClient';
  * Handles all CRUD operations for debts
  */
 
-// Get all debts for the current user, grouped by status
-export const getDebts = async () => {
+// Get all debts for the current user and workflow, grouped by status
+export const getDebts = async (workflowId) => {
     try {
-        const { data, error } = await supabase
+        let query = supabase
             .from('debts')
             .select('*')
             .order('created_at', { ascending: false });
+
+        // Filter by workflow if provided
+        if (workflowId) {
+            query = query.eq('workflow_id', workflowId);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
@@ -52,13 +59,14 @@ export const getDebts = async () => {
 };
 
 // Add a new debt
-export const addDebt = async (debt) => {
+export const addDebt = async (debt, workflowId) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('User not authenticated');
 
         const newDebt = {
             user_id: user.id,
+            workflow_id: workflowId, // Add workflow_id
             borrower_name: debt.borrowerName,
             amount_lent: debt.amountLent,
             amount_repaid: debt.amountRepaid || '$0',
