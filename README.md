@@ -38,6 +38,11 @@
 - **Visual Feedback**: Smooth animations and color-coded stages.
 - **Quick Actions**: Add, edit, or delete deals on the fly.
 
+### 🔔 Notifications & Reminders
+- **Ntfy Integration**: Receive real-time notifications on your phone or desktop via `ntfy.sh`.
+- **Task Reminders**: Set specific times for your tasks and get notified when they are due.
+- **Workflow Alerts**: Get notified about important workflow updates.
+
 ### 👥 Contact Management
 ![Contact](https://vvwdevbjtliztoeixinz.supabase.co/storage/v1/object/public/AVATAR/contact.png)
 - **Centralized Database**: Store all your contacts with details like Company, Role, Email, and Phone.
@@ -85,7 +90,32 @@
 
 ---
 
-## 🚀 Getting Started
+## �️ Supabase Structure
+
+To make everything work, you need to set up your Supabase project with the following structure. You can find the full SQL schema in `supabase/schema.sql` and the migrations in `supabase/migrations/`.
+
+### Tables
+1.  **`users`**: Extends the default auth.users table with profile data.
+2.  **`contacts`**: Stores all CRM contacts.
+3.  **`deals`**: Tracks sales opportunities and their stages.
+4.  **`tasks`**: Manages to-do items and missions.
+5.  **`calendar_events`**: Stores scheduled meetings and events.
+6.  **`debts`**: Tracks money lent and borrowed.
+7.  **`workflows`**: Manages different workspaces/schemes.
+8.  **`workflow_members`**: Links users to workflows with specific roles.
+9.  **`notifications`**: Stores in-app notifications.
+
+### Storage Buckets
+-   **`AVATAR`** (Public): Used for storing user avatars and contact images.
+
+### Row Level Security (RLS)
+All tables have RLS enabled to ensure data security.
+-   **Personal Data**: Users can only see their own data by default.
+-   **Workflow Data**: If a record belongs to a workflow, access is granted based on the user's membership in that workflow.
+
+---
+
+## �🚀 Getting Started
 
 1.  **Clone the repository**
     ```bash
@@ -138,10 +168,19 @@ Visual Auto CRM uses **ntfy.sh** for real-time notifications. Here is how to set
 
 ---
 
+## 🎨 UI/UX Highlights
+
+- **Glassmorphism**: Translucent cards with background blur for a modern, premium feel.
+- **Dark Mode First**: Designed natively for dark mode to reduce eye strain and look cool.
+- **Micro-interactions**: Subtle hover effects and transitions throughout the app.
+- **Responsive Design**: Fully functional on mobile with a dedicated bottom navigation bar.
+
+---
+
 ## ⚠️ Warning
 
 The AI Assistant (**Trevor**) uses strong language and has an aggressive personality. This is a design choice to make the CRM experience more entertaining. **User discretion is advised.**
 
 ---
 
-Built with ❤️ (and a bit of rage) by **[Your Name/Team]**.
+Built with ❤️ (and a bit of rage) by **Seka35**.
