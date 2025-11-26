@@ -3,6 +3,8 @@ import * as contactsService from '../services/contactsService';
 import * as dealsService from '../services/dealsService';
 import * as tasksService from '../services/tasksService';
 import * as eventsService from '../services/eventsService';
+
+import * as debtsService from '../services/debtsService';
 import * as authService from '../services/authService';
 import { useWorkflow } from './WorkflowContext';
 
@@ -47,6 +49,13 @@ export const CRMProvider = ({ children }) => {
     // --- Events State (Calendar) ---
     const [events, setEvents] = useState([]);
 
+    // --- Debts State ---
+    const [debts, setDebts] = useState({
+        lent: { id: 'lent', title: 'MONEY LENT', color: 'bg-red-500', items: [] },
+        partial: { id: 'partial', title: 'PARTIALLY REPAID', color: 'bg-yellow-500', items: [] },
+        repaid: { id: 'repaid', title: 'FULLY REPAID', color: 'bg-green-500', items: [] }
+    });
+
     // --- Auth Effects ---
     useEffect(() => {
         // Check for existing session
@@ -84,7 +93,13 @@ export const CRMProvider = ({ children }) => {
                     won: { id: 'won', title: 'Won', color: 'bg-success', items: [] }
                 });
                 setTasks([]);
+                setTasks([]);
                 setEvents([]);
+                setDebts({
+                    lent: { id: 'lent', title: 'MONEY LENT', color: 'bg-red-500', items: [] },
+                    partial: { id: 'partial', title: 'PARTIALLY REPAID', color: 'bg-yellow-500', items: [] },
+                    repaid: { id: 'repaid', title: 'FULLY REPAID', color: 'bg-green-500', items: [] }
+                });
             }
         });
 
@@ -104,7 +119,9 @@ export const CRMProvider = ({ children }) => {
             loadContacts(),
             loadDeals(),
             loadTasks(),
-            loadEvents()
+            loadTasks(),
+            loadEvents(),
+            loadDebts()
         ]);
         setLoading(false);
     };
@@ -319,7 +336,7 @@ export const CRMProvider = ({ children }) => {
             console.error('Error updating event:', error);
             setError(error.message);
         } else {
-            setEvents(prev => prev.map(e => e.id === id ? { ...e, ...updatedEvent } : e));
+            setEvents(prev => prev.map(e => e.id === id ? data : e));
         }
     };
 
@@ -330,6 +347,61 @@ export const CRMProvider = ({ children }) => {
             setError(error.message);
         } else {
             setEvents(prev => prev.filter(e => e.id !== id));
+        }
+    };
+
+    // --- Debts Functions ---
+    const loadDebts = async () => {
+        const { data, error } = await debtsService.getDebts();
+        if (error) {
+            console.error('Error loading debts:', error);
+            setError(error.message);
+        } else {
+            setDebts(data);
+        }
+    };
+
+    const addDebt = async (debt) => {
+        const { data, error } = await debtsService.addDebt(debt);
+        if (error) {
+            console.error('Error adding debt:', error);
+            setError(error.message);
+            return null;
+        } else {
+            await loadDebts();
+            return data;
+        }
+    };
+
+    const updateDebt = async (id, updates) => {
+        const { data, error } = await debtsService.updateDebt(id, updates);
+        if (error) {
+            console.error('Error updating debt:', error);
+            setError(error.message);
+        } else {
+            await loadDebts();
+        }
+    };
+
+    const updateDebts = async (newDebtsState) => {
+        setDebts(newDebtsState);
+    };
+
+    const moveDebt = async (debtId, newStatus) => {
+        const { error } = await debtsService.moveDebt(debtId, newStatus);
+        if (error) {
+            console.error('Error moving debt:', error);
+            setError(error.message);
+        }
+    };
+
+    const deleteDebt = async (id) => {
+        const { error } = await debtsService.deleteDebt(id);
+        if (error) {
+            console.error('Error deleting debt:', error);
+            setError(error.message);
+        } else {
+            await loadDebts();
         }
     };
 
@@ -420,7 +492,16 @@ export const CRMProvider = ({ children }) => {
             addEvent,
             updateEvent,
             deleteEvent,
-            setEvents
+            setEvents,
+
+            // Debts
+            debts,
+            addDebt,
+            updateDebt,
+            updateDebts,
+            moveDebt,
+            deleteDebt,
+            setDebts
         }}>
             {children}
         </CRMContext.Provider>

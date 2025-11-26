@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Briefcase, CheckSquare, Calendar, Sparkles, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, CheckSquare, Calendar, Sparkles, BarChart2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const MobileNav = ({ onOpenAI }) => {
@@ -10,7 +10,7 @@ const MobileNav = ({ onOpenAI }) => {
         { icon: Briefcase, label: 'Deals', path: '/deals' },
         { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
         { icon: Calendar, label: 'Calendar', path: '/calendar' },
-        { icon: BarChart3, label: 'Reports', path: '/reports' },
+        { icon: BarChart2, label: 'Debts', path: '/debts' },
     ];
 
     // Split items to place AI button in middle (3 on left, 3 on right)

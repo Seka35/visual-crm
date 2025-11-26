@@ -9,6 +9,7 @@ import Calendar from './pages/Calendar';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
+import Debts from './pages/Debts';
 
 import { CRMProvider, useCRM } from './context/CRMContext';
 import { WorkflowProvider } from './context/WorkflowContext';
@@ -80,6 +81,7 @@ function AppRoutes() {
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="calendar" element={<Calendar />} />
                 <Route path="reports" element={<Reports />} />
+                <Route path="debts" element={<Debts />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>

@@ -23,7 +23,7 @@ const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => 
         { icon: Briefcase, label: 'BIG SCORES', path: '/deals' },
         { icon: CheckSquare, label: 'MISSIONS', path: '/tasks' },
         { icon: Calendar, label: 'THE PLAN', path: '/calendar' },
-        { icon: BarChart2, label: 'THE LEDGER', path: '/reports' },
+        { icon: BarChart2, label: 'THE DEPTS', path: '/debts' },
     ];
 
     return (

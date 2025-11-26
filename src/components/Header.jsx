@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Bell, ChevronDown, Settings, User, LogOut, HelpCircle, Moon, Sun, Share2, Plus, Check } from 'lucide-react';
+import { Search, Bell, ChevronDown, Settings, User, LogOut, HelpCircle, Moon, Sun, Share2, Plus, Check, BarChart2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useCRM } from '../context/CRMContext';
 import { useWorkflow } from '../context/WorkflowContext';
@@ -214,6 +214,16 @@ const Header = ({ onMenuClick }) => {
                                         >
                                             <Share2 className="w-4 h-4" />
                                             <span className="font-gta tracking-wide">OPERATIONS</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/reports');
+                                                setIsProfileOpen(false);
+                                            }}
+                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors"
+                                        >
+                                            <BarChart2 className="w-4 h-4" />
+                                            <span className="font-gta tracking-wide">THE LEDGER</span>
                                         </button>
                                         <button
                                             onClick={() => {

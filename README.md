@@ -36,9 +36,11 @@
 - **Search & Filter**: Instantly find who you're looking for.
 - **Direct Actions**: Call or email directly from the contact card.
 
-### 📈 Reports & Analytics
-- **Revenue Charts**: Visual breakdown of revenue over time (now with fixed calculation logic!).
-- **Pipeline Analysis**: Detailed charts showing deal distribution and conversion rates.
+### 💰 Debt Management (The Depts)
+- **Track Debts**: Keep track of who owes you money and how much.
+- **Visual Status**: See at a glance if a debt is Lent, Partially Repaid, or Fully Repaid.
+- **Reminders**: Set due dates and get notified when it's time to collect.
+- **Drag & Drop**: Easily update status by moving cards between columns.
 
 ---
 
