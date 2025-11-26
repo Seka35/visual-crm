@@ -53,10 +53,10 @@ const Header = ({ onMenuClick }) => {
 
     return (
         <>
-            <header className="h-20 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40 glass mb-8 rounded-b-2xl mx-4 mt-2">
+            <header className="h-20 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40 glass mb-8 rounded-b-2xl mx-4 mt-2 relative">
                 <div className="flex items-center gap-4 flex-1 max-w-xl">
-                    {/* Mobile Logo */}
-                    <div className="sm:hidden w-8 h-8 flex-shrink-0">
+                    {/* Mobile Logo - Centered */}
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:hidden w-24 h-24 flex-shrink-0 pointer-events-none">
                         <img src={theme === 'dark' ? logoWhite : logoBlack} alt="Logo" className="w-full h-full object-contain" />
                     </div>
 
@@ -169,13 +169,16 @@ const Header = ({ onMenuClick }) => {
                                 <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{displayName}</p>
                                 <p className="text-xs font-bold text-green-500 font-gta tracking-wider">{formattedRevenue}</p>
                             </div>
-                            <div className="flex items-center gap-2 p-1.5 rounded-xl transition-colors border border-transparent hover:border-slate-200">
-                                <img
-                                    src={userAvatar}
-                                    alt="User"
-                                    className="w-10 h-10 rounded-full bg-primary/10"
-                                />
-                                <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", isProfileOpen && "rotate-180")} />
+                            <div className="flex flex-col items-center">
+                                <div className="flex items-center gap-2 p-1.5 rounded-xl transition-colors border border-transparent hover:border-slate-200">
+                                    <img
+                                        src={userAvatar}
+                                        alt="User"
+                                        className="w-10 h-10 rounded-full bg-primary/10"
+                                    />
+                                    <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform hidden sm:block", isProfileOpen && "rotate-180")} />
+                                </div>
+                                <span className="md:hidden text-[10px] font-bold text-green-500 font-gta tracking-wider -mt-1">{formattedRevenue}</span>
                             </div>
                         </button>
 

@@ -188,7 +188,7 @@ const Deals = () => {
                 onDragEnd={handleDragEnd}
             >
                 <div className="flex-1 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-4">
-                    <div className="flex flex-col md:flex-row gap-6 h-full md:min-w-fit px-1">
+                    <div className="grid grid-cols-2 md:flex md:flex-row gap-6 h-full md:min-w-fit px-1">
                         {Object.values(columns).map((col) => (
                             <KanbanColumn
                                 key={col.id}

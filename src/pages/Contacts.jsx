@@ -90,7 +90,7 @@ const Contacts = () => {
 
             {/* Content */}
             {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredContacts.map(contact => (
                         <div key={contact.id} onClick={() => handleEditContact(contact)} className="cursor-pointer">
                             <ContactCard contact={contact} />
