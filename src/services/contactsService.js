@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabaseClient';
  * Handles all CRUD operations for contacts
  */
 
-// Get all contacts for the current user
 // Get all contacts for the current workflow
 export const getContacts = async (workflowId = null) => {
     try {
@@ -17,6 +16,21 @@ export const getContacts = async (workflowId = null) => {
                     avatar_url,
                     full_name,
                     email
+                ),
+                task_contacts (
+                    task: tasks (
+                        id,
+                        title,
+                        completed
+                    )
+                ),
+                deal_contacts (
+                    deal: deals (
+                        id,
+                        title,
+                        amount,
+                        status
+                    )
                 )
             `)
             .order('created_at', { ascending: false });
@@ -31,11 +45,13 @@ export const getContacts = async (workflowId = null) => {
 
         if (error) throw error;
 
-        // Transform data to include creator info
+        // Transform data to include creator info and associations
         const transformedData = data.map(contact => ({
             ...contact,
             creatorAvatar: contact.users?.avatar_url,
-            creatorName: contact.users?.full_name || contact.users?.email
+            creatorName: contact.users?.full_name || contact.users?.email,
+            tasks: contact.task_contacts?.map(tc => tc.task) || [],
+            deals: contact.deal_contacts?.map(dc => dc.deal) || []
         }));
 
         return { data: transformedData, error: null };
@@ -50,19 +66,42 @@ export const getContact = async (id) => {
     try {
         const { data, error } = await supabase
             .from('contacts')
-            .select('*')
+            .select(`
+                *,
+                task_contacts (
+                    task: tasks (
+                        id,
+                        title,
+                        completed
+                    )
+                ),
+                deal_contacts (
+                    deal: deals (
+                        id,
+                        title,
+                        amount,
+                        status
+                    )
+                )
+            `)
             .eq('id', id)
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        const transformedData = {
+            ...data,
+            tasks: data.task_contacts?.map(tc => tc.task) || [],
+            deals: data.deal_contacts?.map(dc => dc.deal) || []
+        };
+
+        return { data: transformedData, error: null };
     } catch (error) {
         console.error('Error fetching contact:', error);
         return { data: null, error };
     }
 };
 
-// Add a new contact
 // Add a new contact
 export const addContact = async (contact, workflowId = null) => {
     try {
@@ -91,7 +130,28 @@ export const addContact = async (contact, workflowId = null) => {
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        // Handle associations
+        if (contact.taskIds && contact.taskIds.length > 0) {
+            const tasksToInsert = contact.taskIds.map(tid => ({
+                contact_id: data.id,
+                task_id: tid
+            }));
+            await supabase.from('task_contacts').insert(tasksToInsert);
+        }
+
+        if (contact.dealIds && contact.dealIds.length > 0) {
+            const dealsToInsert = contact.dealIds.map(did => ({
+                contact_id: data.id,
+                deal_id: did
+            }));
+            await supabase.from('deal_contacts').insert(dealsToInsert);
+        }
+
+        // Fetch complete object with associations for return
+        const { data: completeContact } = await getContact(data.id);
+        return { data: completeContact, error: null };
+
     } catch (error) {
         console.error('Error adding contact:', error.message);
         if (error.details) console.error('Error details:', error.details);
@@ -103,15 +163,45 @@ export const addContact = async (contact, workflowId = null) => {
 // Update an existing contact
 export const updateContact = async (id, updates) => {
     try {
+        const dbUpdates = { ...updates };
+        delete dbUpdates.taskIds;
+        delete dbUpdates.dealIds;
+
         const { data, error } = await supabase
             .from('contacts')
-            .update(updates)
+            .update(dbUpdates)
             .eq('id', id)
             .select()
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        // Handle associations updates
+        if (updates.taskIds !== undefined) {
+            await supabase.from('task_contacts').delete().eq('contact_id', id);
+            if (updates.taskIds.length > 0) {
+                const tasksToInsert = updates.taskIds.map(tid => ({
+                    contact_id: id,
+                    task_id: tid
+                }));
+                await supabase.from('task_contacts').insert(tasksToInsert);
+            }
+        }
+
+        if (updates.dealIds !== undefined) {
+            await supabase.from('deal_contacts').delete().eq('contact_id', id);
+            if (updates.dealIds.length > 0) {
+                const dealsToInsert = updates.dealIds.map(did => ({
+                    contact_id: id,
+                    deal_id: did
+                }));
+                await supabase.from('deal_contacts').insert(dealsToInsert);
+            }
+        }
+
+        // Fetch complete object with associations for return
+        const { data: completeContact } = await getContact(id);
+        return { data: completeContact, error: null };
     } catch (error) {
         console.error('Error updating contact:', error);
         return { data: null, error };
@@ -134,7 +224,6 @@ export const deleteContact = async (id) => {
     }
 };
 
-// Search contacts by name, email, or company
 // Search contacts by name, email, or company
 export const searchContacts = async (query, workflowId = null) => {
     try {

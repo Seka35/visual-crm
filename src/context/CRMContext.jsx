@@ -216,6 +216,7 @@ export const CRMProvider = ({ children }) => {
             return null;
         } else {
             await loadDeals(); // Reload to get fresh grouped data
+            await loadContacts();
             return data;
         }
     };
@@ -227,6 +228,7 @@ export const CRMProvider = ({ children }) => {
             setError(error.message);
         } else {
             await loadDeals(); // Reload to get fresh grouped data
+            await loadContacts();
         }
     };
 
@@ -251,6 +253,7 @@ export const CRMProvider = ({ children }) => {
             setError(error.message);
         } else {
             await loadDeals();
+            await loadContacts();
         }
     };
 
@@ -273,6 +276,7 @@ export const CRMProvider = ({ children }) => {
             return null;
         } else {
             setTasks(prev => [data, ...prev]);
+            await loadContacts();
             return data;
         }
     };
@@ -294,6 +298,7 @@ export const CRMProvider = ({ children }) => {
             setError(error.message);
         } else {
             await loadTasks();
+            await loadContacts();
         }
     };
 
@@ -304,6 +309,7 @@ export const CRMProvider = ({ children }) => {
             setError(error.message);
         } else {
             setTasks(prev => prev.filter(t => t.id !== id));
+            await loadContacts();
         }
     };
 

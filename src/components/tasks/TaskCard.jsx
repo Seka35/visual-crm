@@ -82,6 +82,25 @@ const TaskCard = ({ task, onToggle, onEdit }) => {
                     <Pencil className="w-4 h-4" />
                 </button>
 
+                {task.contacts && task.contacts.length > 0 && (
+                    <div className="flex -space-x-2 mr-2">
+                        {task.contacts.slice(0, 3).map((contact) => (
+                            <img
+                                key={contact.id}
+                                src={contact.avatar}
+                                alt={contact.name}
+                                title={contact.name}
+                                className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 object-cover"
+                            />
+                        ))}
+                        {task.contacts.length > 3 && (
+                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                +{task.contacts.length - 3}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <img
                     src={task.assigneeAvatar}
                     alt=""

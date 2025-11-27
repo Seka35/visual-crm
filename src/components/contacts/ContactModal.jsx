@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Building, Mail, Phone, Tag, Upload, Camera } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import { useCRM } from '../../context/CRMContext';
 
 const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) => {
+    const { tasks, deals } = useCRM();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -11,7 +13,9 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
         email: '',
         phone: '',
         tags: '',
-        avatar: null
+        avatar: null,
+        taskIds: [],
+        dealIds: []
     });
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -20,6 +24,17 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
     useEffect(() => {
         if (initialData) {
             const [firstName, ...lastNameParts] = (initialData.name || '').split(' ');
+
+            // Calculate initial associations from global context to ensure accuracy
+            const associatedTaskIds = tasks
+                .filter(t => t.contacts?.some(c => c.id === initialData.id))
+                .map(t => t.id);
+
+            const associatedDealIds = Object.values(deals)
+                .flatMap(s => s.items)
+                .filter(d => d.contacts?.some(c => c.id === initialData.id))
+                .map(d => d.id);
+
             setFormData({
                 firstName: firstName || '',
                 lastName: lastNameParts.join(' ') || '',
@@ -28,7 +43,9 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                 email: initialData.email || '',
                 phone: initialData.phone || '',
                 tags: initialData.tags?.join(', ') || '',
-                avatar: initialData.avatar || null
+                avatar: initialData.avatar || null,
+                taskIds: associatedTaskIds,
+                dealIds: associatedDealIds
             });
             setPreviewUrl(initialData.avatar || null);
         } else {
@@ -40,7 +57,9 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                 email: '',
                 phone: '',
                 tags: '',
-                avatar: null
+                avatar: null,
+                taskIds: [],
+                dealIds: []
             });
             setPreviewUrl(null);
         }
@@ -54,6 +73,28 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
+        });
+    };
+
+    const toggleTask = (taskId) => {
+        setFormData(prev => {
+            const current = prev.taskIds || [];
+            if (current.includes(taskId)) {
+                return { ...prev, taskIds: current.filter(id => id !== taskId) };
+            } else {
+                return { ...prev, taskIds: [...current, taskId] };
+            }
+        });
+    };
+
+    const toggleDeal = (dealId) => {
+        setFormData(prev => {
+            const current = prev.dealIds || [];
+            if (current.includes(dealId)) {
+                return { ...prev, dealIds: current.filter(id => id !== dealId) };
+            } else {
+                return { ...prev, dealIds: [...current, dealId] };
+            }
         });
     };
 
@@ -100,7 +141,9 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                 email: formData.email,
                 phone: formData.phone,
                 tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-                avatar: formData.avatar
+                avatar: formData.avatar,
+                taskIds: formData.taskIds,
+                dealIds: formData.dealIds
             };
             await onSubmit(contactData);
         } catch (error) {
@@ -252,6 +295,134 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                                 />
                             </div>
                         </div>
+
+                        {/* Associations Selectors */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Associate Tasks</label>
+                                <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+                                    <div className="flex flex-wrap gap-2 mb-3">
+                                        {formData.taskIds?.map(id => {
+                                            const task = tasks.find(t => t.id === id);
+                                            if (!task) return null;
+                                            return (
+                                                <span key={id} className="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-600">
+                                                    <div className={`w-2 h-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-slate-300'}`} />
+                                                    <span className="truncate max-w-[100px]">{task.title}</span>
+                                                    <button type="button" onClick={() => toggleTask(id)} className="hover:text-red-500 ml-1">
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </span>
+                                            );
+                                        })}
+                                        {(!formData.taskIds || formData.taskIds.length === 0) && (
+                                            <span className="text-slate-400 text-sm italic">No tasks selected</span>
+                                        )}
+                                    </div>
+                                    <select
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                toggleTask(e.target.value);
+                                                e.target.value = "";
+                                            }
+                                        }}
+                                        className="w-full py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none text-slate-600 dark:text-white appearance-none px-3"
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Add a task...</option>
+                                        {tasks.filter(t => !formData.taskIds?.includes(t.id)).map(task => (
+                                            <option key={task.id} value={task.id}>
+                                                {task.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Associate Deals</label>
+                                <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+                                    <div className="flex flex-wrap gap-2 mb-3">
+                                        {formData.dealIds?.map(id => {
+                                            const deal = Object.values(deals).flatMap(s => s.items).find(d => d.id === id);
+                                            if (!deal) return null;
+                                            return (
+                                                <span key={id} className="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-600">
+                                                    <span className="truncate max-w-[100px]">{deal.title}</span>
+                                                    <button type="button" onClick={() => toggleDeal(id)} className="hover:text-red-500 ml-1">
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </span>
+                                            );
+                                        })}
+                                        {(!formData.dealIds || formData.dealIds.length === 0) && (
+                                            <span className="text-slate-400 text-sm italic">No deals selected</span>
+                                        )}
+                                    </div>
+                                    <select
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                toggleDeal(e.target.value);
+                                                e.target.value = "";
+                                            }
+                                        }}
+                                        className="w-full py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none text-slate-600 dark:text-white appearance-none px-3"
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Add a deal...</option>
+                                        {Object.values(deals).flatMap(s => s.items).filter(d => !formData.dealIds?.includes(d.id)).map(deal => (
+                                            <option key={deal.id} value={deal.id}>
+                                                {deal.title} ({deal.amount})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {isEditing && (
+                            <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
+                                <h4 className="font-bold text-slate-800 dark:text-white mb-4">Associated Items</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h5 className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                            Tasks
+                                        </h5>
+                                        <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                                            {tasks.filter(t => t.contacts?.some(c => c.id === initialData.id)).length > 0 ? (
+                                                tasks.filter(t => t.contacts?.some(c => c.id === initialData.id)).map(task => (
+                                                    <div key={task.id} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                                                        <div className={`w-2 h-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-slate-300'}`} />
+                                                        <span className={`text-sm text-slate-700 dark:text-slate-200 truncate ${task.completed ? 'line-through opacity-50' : ''}`}>{task.title}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="text-xs text-slate-400 italic pl-2">No associated tasks</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-purple-500" />
+                                            Deals
+                                        </h5>
+                                        <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                                            {Object.values(deals).flatMap(s => s.items).filter(d => d.contacts?.some(c => c.id === initialData.id)).length > 0 ? (
+                                                Object.values(deals).flatMap(s => s.items).filter(d => d.contacts?.some(c => c.id === initialData.id)).map(deal => (
+                                                    <div key={deal.id} className="flex items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                                                        <span className="text-sm text-slate-700 dark:text-slate-200 truncate font-medium">{deal.title}</span>
+                                                        <span className="text-xs font-bold text-slate-500 bg-white dark:bg-slate-900 px-2 py-1 rounded-lg shadow-sm">{deal.amount}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="text-xs text-slate-400 italic pl-2">No associated deals</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-3 sticky bottom-0 bg-white dark:bg-slate-900 z-20">

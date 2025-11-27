@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Building, Calendar, BarChart } from 'lucide-react';
+import { X, DollarSign, Building, Calendar, BarChart, Users } from 'lucide-react';
+import { useCRM } from '../../context/CRMContext';
 
 const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) => {
+    const { contacts } = useCRM();
     const [formData, setFormData] = useState({
         title: '',
         value: '',
         date: '',
         client: '',
-        stage: 'lead'
+        stage: 'lead',
+        contactIds: []
     });
     const [loading, setLoading] = useState(false);
 
@@ -18,7 +21,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 value: initialData.amount?.replace(/[^0-9]/g, '') || '',
                 date: initialData.date || '',
                 client: initialData.clientName || '',
-                stage: initialData.stage || 'lead' // Ensure stage is mapped correctly if needed
+                stage: initialData.stage || 'lead',
+                contactIds: initialData.contacts?.map(c => c.id) || []
             });
         } else {
             setFormData({
@@ -26,7 +30,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 value: '',
                 date: new Date().toISOString().split('T')[0],
                 client: '',
-                stage: 'lead'
+                stage: 'lead',
+                contactIds: []
             });
         }
     }, [initialData, isOpen]);
@@ -42,6 +47,17 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
         });
     };
 
+    const toggleContact = (contactId) => {
+        setFormData(prev => {
+            const current = prev.contactIds || [];
+            if (current.includes(contactId)) {
+                return { ...prev, contactIds: current.filter(id => id !== contactId) };
+            } else {
+                return { ...prev, contactIds: [...current, contactId] };
+            }
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -51,7 +67,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 amount: `$${formData.value}`,
                 date: formData.date,
                 clientName: formData.client,
-                status: formData.stage
+                status: formData.stage,
+                contactIds: formData.contactIds
             };
             await onSubmit(dealData);
             onClose();
@@ -69,8 +86,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 onClick={onClose}
             />
 
-            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl relative z-10 animate-in zoom-in-95 duration-200">
-                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl relative z-10 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-20">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white">{isEditing ? 'Edit Deal' : 'New Deal'}</h3>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-400" />
@@ -125,7 +142,7 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Client</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Client Name</label>
                             <div className="relative">
                                 <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                 <input
@@ -133,10 +150,54 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                                     name="client"
                                     value={formData.client}
                                     onChange={handleChange}
-                                    placeholder="Search client..."
+                                    placeholder="Company or Client Name"
                                     className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
                                     required
                                 />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Associated Contacts</label>
+                            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {formData.contactIds.map(id => {
+                                        const contact = contacts.find(c => c.id === id);
+                                        if (!contact) return null;
+                                        return (
+                                            <span key={id} className="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-600">
+                                                {contact.avatar && <img src={contact.avatar} alt="" className="w-4 h-4 rounded-full" />}
+                                                {contact.name}
+                                                <button type="button" onClick={() => toggleContact(id)} className="hover:text-red-500 ml-1">
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                    {formData.contactIds.length === 0 && (
+                                        <span className="text-slate-400 text-sm italic">No contacts selected</span>
+                                    )}
+                                </div>
+                                <div className="relative">
+                                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <select
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                toggleContact(e.target.value);
+                                                e.target.value = "";
+                                            }
+                                        }}
+                                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none text-slate-600 dark:text-white appearance-none"
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Add a contact...</option>
+                                        {contacts.filter(c => !formData.contactIds.includes(c.id)).map(contact => (
+                                            <option key={contact.id} value={contact.id}>
+                                                {contact.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -160,7 +221,7 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                         </div>
                     </div>
 
-                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-3">
+                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-3 sticky bottom-0 bg-white dark:bg-slate-900 z-20">
                         {isEditing ? (
                             <button
                                 type="button"

@@ -6,7 +6,6 @@ import { supabase } from '../lib/supabaseClient';
  */
 
 // Get all deals for the current user, grouped by status
-// Get all deals for the current user, grouped by status
 export const getDeals = async (workflowId = null) => {
     try {
         let query = supabase
@@ -17,6 +16,13 @@ export const getDeals = async (workflowId = null) => {
                     avatar_url,
                     full_name,
                     email
+                ),
+                deal_contacts (
+                    contact: contacts (
+                        id,
+                        name,
+                        avatar
+                    )
                 )
             `)
             .order('created_at', { ascending: false });
@@ -78,7 +84,7 @@ export const getDeals = async (workflowId = null) => {
                 ownerAvatar: deal.users?.avatar_url || deal.owner_avatar,
                 ownerName: deal.users?.full_name || deal.users?.email,
                 notes: deal.notes,
-                contactId: deal.contact_id
+                contacts: deal.deal_contacts?.map(dc => dc.contact) || []
             };
 
             if (groupedDeals[deal.status]) {
@@ -98,19 +104,33 @@ export const getDeal = async (id) => {
     try {
         const { data, error } = await supabase
             .from('deals')
-            .select('*')
+            .select(`
+                *,
+                deal_contacts (
+                    contact: contacts (
+                        id,
+                        name,
+                        avatar
+                    )
+                )
+            `)
             .eq('id', id)
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        const transformedData = {
+            ...data,
+            contacts: data.deal_contacts?.map(dc => dc.contact) || []
+        };
+
+        return { data: transformedData, error: null };
     } catch (error) {
         console.error('Error fetching deal:', error);
         return { data: null, error };
     }
 };
 
-// Add a new deal
 // Add a new deal
 export const addDeal = async (deal, workflowId = null) => {
     try {
@@ -129,8 +149,7 @@ export const addDeal = async (deal, workflowId = null) => {
             status: deal.status || 'lead',
             date: deal.date || new Date().toLocaleDateString(),
             owner_avatar: deal.ownerAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
-            notes: deal.notes || '',
-            contact_id: deal.contactId || null
+            notes: deal.notes || ''
         };
 
         const { data, error } = await supabase
@@ -140,7 +159,31 @@ export const addDeal = async (deal, workflowId = null) => {
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        // Handle contacts association
+        let associatedContacts = [];
+        if (deal.contactIds && deal.contactIds.length > 0) {
+            const contactsToInsert = deal.contactIds.map(cid => ({
+                deal_id: data.id,
+                contact_id: cid
+            }));
+            const { error: contactsError } = await supabase
+                .from('deal_contacts')
+                .insert(contactsToInsert);
+
+            if (contactsError) console.error('Error associating contacts:', contactsError);
+
+            // Fetch the associated contacts details for the return object
+            if (!contactsError) {
+                const { data: contactsData } = await supabase
+                    .from('contacts')
+                    .select('id, name, avatar')
+                    .in('id', deal.contactIds);
+                associatedContacts = contactsData || [];
+            }
+        }
+
+        return { data: { ...data, contacts: associatedContacts }, error: null };
     } catch (error) {
         console.error('Error adding deal:', error);
         return { data: null, error };
@@ -155,7 +198,6 @@ export const updateDeal = async (id, updates) => {
         if (updates.clientName !== undefined) dbUpdates.client_name = updates.clientName;
         if (updates.clientLogo !== undefined) dbUpdates.client_logo = updates.clientLogo;
         if (updates.ownerAvatar !== undefined) dbUpdates.owner_avatar = updates.ownerAvatar;
-        if (updates.contactId !== undefined) dbUpdates.contact_id = updates.contactId;
         if (updates.title !== undefined) dbUpdates.title = updates.title;
         if (updates.amount !== undefined) {
             dbUpdates.amount = updates.amount;
@@ -174,7 +216,37 @@ export const updateDeal = async (id, updates) => {
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        // Handle contacts updates
+        let associatedContacts = [];
+        if (updates.contactIds !== undefined) {
+            // Delete existing associations
+            await supabase.from('deal_contacts').delete().eq('deal_id', id);
+
+            // Insert new associations
+            if (updates.contactIds.length > 0) {
+                const contactsToInsert = updates.contactIds.map(cid => ({
+                    deal_id: id,
+                    contact_id: cid
+                }));
+                await supabase.from('deal_contacts').insert(contactsToInsert);
+
+                const { data: contactsData } = await supabase
+                    .from('contacts')
+                    .select('id, name, avatar')
+                    .in('id', updates.contactIds);
+                associatedContacts = contactsData || [];
+            }
+        } else {
+            // If not updating contacts, fetch existing ones to return complete object
+            const { data: existingContacts } = await supabase
+                .from('deal_contacts')
+                .select('contact:contacts(id, name, avatar)')
+                .eq('deal_id', id);
+            associatedContacts = existingContacts?.map(ec => ec.contact) || [];
+        }
+
+        return { data: { ...data, contacts: associatedContacts }, error: null };
     } catch (error) {
         console.error('Error updating deal:', error);
         return { data: null, error };

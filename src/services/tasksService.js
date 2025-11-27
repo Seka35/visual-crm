@@ -17,6 +17,13 @@ export const getTasks = async (workflowId = null) => {
                     avatar_url,
                     full_name,
                     email
+                ),
+                task_contacts (
+                    contact: contacts (
+                        id,
+                        name,
+                        avatar
+                    )
                 )
             `)
             .order('created_at', { ascending: false });
@@ -44,8 +51,7 @@ export const getTasks = async (workflowId = null) => {
             assigneeAvatar: task.users?.avatar_url || task.assignee_avatar,
             assigneeName: task.users?.full_name || task.users?.email,
             completed: task.completed,
-            contactId: task.contact_id,
-            dealId: task.deal_id,
+            contacts: task.task_contacts?.map(tc => tc.contact) || [],
             createdAt: task.created_at,
             updatedAt: task.updated_at
         }));
@@ -62,12 +68,27 @@ export const getTask = async (id) => {
     try {
         const { data, error } = await supabase
             .from('tasks')
-            .select('*')
+            .select(`
+                *,
+                task_contacts (
+                    contact: contacts (
+                        id,
+                        name,
+                        avatar
+                    )
+                )
+            `)
             .eq('id', id)
             .single();
 
         if (error) throw error;
-        return { data, error: null };
+
+        const transformedData = {
+            ...data,
+            contacts: data.task_contacts?.map(tc => tc.contact) || []
+        };
+
+        return { data: transformedData, error: null };
     } catch (error) {
         console.error('Error fetching task:', error);
         return { data: null, error };
@@ -91,9 +112,7 @@ export const addTask = async (task, workflowId = null) => {
             priority: task.priority || 'medium',
             project: task.project || 'General',
             assignee_avatar: task.assigneeAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
-            completed: task.completed || false,
-            contact_id: task.contactId || null,
-            deal_id: task.dealId || null
+            completed: task.completed || false
         };
 
         const { data, error } = await supabase
@@ -103,6 +122,29 @@ export const addTask = async (task, workflowId = null) => {
             .single();
 
         if (error) throw error;
+
+        // Handle contacts association
+        let associatedContacts = [];
+        if (task.contactIds && task.contactIds.length > 0) {
+            const contactsToInsert = task.contactIds.map(cid => ({
+                task_id: data.id,
+                contact_id: cid
+            }));
+            const { error: contactsError } = await supabase
+                .from('task_contacts')
+                .insert(contactsToInsert);
+
+            if (contactsError) console.error('Error associating contacts:', contactsError);
+
+            // Fetch the associated contacts details for the return object
+            if (!contactsError) {
+                const { data: contactsData } = await supabase
+                    .from('contacts')
+                    .select('id, name, avatar')
+                    .in('id', task.contactIds);
+                associatedContacts = contactsData || [];
+            }
+        }
 
         // Transform response
         const transformedData = {
@@ -116,8 +158,7 @@ export const addTask = async (task, workflowId = null) => {
             project: data.project,
             assigneeAvatar: data.assignee_avatar,
             completed: data.completed,
-            contactId: data.contact_id,
-            dealId: data.deal_id
+            contacts: associatedContacts
         };
 
         return { data: transformedData, error: null };
@@ -141,8 +182,6 @@ export const updateTask = async (id, updates) => {
         if (updates.project !== undefined) dbUpdates.project = updates.project;
         if (updates.assigneeAvatar !== undefined) dbUpdates.assignee_avatar = updates.assigneeAvatar;
         if (updates.completed !== undefined) dbUpdates.completed = updates.completed;
-        if (updates.contactId !== undefined) dbUpdates.contact_id = updates.contactId;
-        if (updates.dealId !== undefined) dbUpdates.deal_id = updates.dealId;
 
         const { data, error } = await supabase
             .from('tasks')
@@ -152,6 +191,35 @@ export const updateTask = async (id, updates) => {
             .single();
 
         if (error) throw error;
+
+        // Handle contacts updates
+        let associatedContacts = [];
+        if (updates.contactIds !== undefined) {
+            // Delete existing associations
+            await supabase.from('task_contacts').delete().eq('task_id', id);
+
+            // Insert new associations
+            if (updates.contactIds.length > 0) {
+                const contactsToInsert = updates.contactIds.map(cid => ({
+                    task_id: id,
+                    contact_id: cid
+                }));
+                await supabase.from('task_contacts').insert(contactsToInsert);
+
+                const { data: contactsData } = await supabase
+                    .from('contacts')
+                    .select('id, name, avatar')
+                    .in('id', updates.contactIds);
+                associatedContacts = contactsData || [];
+            }
+        } else {
+            // If not updating contacts, fetch existing ones to return complete object
+            const { data: existingContacts } = await supabase
+                .from('task_contacts')
+                .select('contact:contacts(id, name, avatar)')
+                .eq('task_id', id);
+            associatedContacts = existingContacts?.map(ec => ec.contact) || [];
+        }
 
         // Transform response
         const transformedData = {
@@ -165,8 +233,7 @@ export const updateTask = async (id, updates) => {
             project: data.project,
             assigneeAvatar: data.assignee_avatar,
             completed: data.completed,
-            contactId: data.contact_id,
-            dealId: data.deal_id
+            contacts: associatedContacts
         };
 
         return { data: transformedData, error: null };

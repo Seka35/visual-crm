@@ -74,11 +74,31 @@ const DealCard = ({ deal, onClick }) => {
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{deal.date}</span>
                 </div>
-                <img
-                    src={deal.ownerAvatar}
-                    alt="Owner"
-                    className="w-6 h-6 rounded-full border-2 border-white"
-                />
+                <div className="flex items-center gap-2">
+                    {deal.contacts && deal.contacts.length > 0 && (
+                        <div className="flex -space-x-2">
+                            {deal.contacts.slice(0, 3).map((contact) => (
+                                <img
+                                    key={contact.id}
+                                    src={contact.avatar}
+                                    alt={contact.name}
+                                    title={contact.name}
+                                    className="w-5 h-5 rounded-full border-2 border-white dark:border-slate-800 object-cover"
+                                />
+                            ))}
+                            {deal.contacts.length > 3 && (
+                                <div className="w-5 h-5 rounded-full border-2 border-white dark:border-slate-800 bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[8px] font-bold text-slate-500">
+                                    +{deal.contacts.length - 3}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <img
+                        src={deal.ownerAvatar}
+                        alt="Owner"
+                        className="w-6 h-6 rounded-full border-2 border-white"
+                    />
+                </div>
             </div>
         </div>
     );
