@@ -100,7 +100,7 @@ const DebtCard = ({ debt, deal, onClick }) => {
                         {reminderDate && (
                             <div className="flex items-center gap-1.5 text-xs text-yellow-600 font-medium">
                                 <AlertCircle className="w-3.5 h-3.5" />
-                                <span>{reminderDate}</span>
+                                <span>{new Date(item.reminder_date).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                         )}
                     </div>
