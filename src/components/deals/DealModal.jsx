@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Building, Calendar, BarChart, Users, FileText, CreditCard, Wallet } from 'lucide-react';
+import { X, DollarSign, Building, Calendar, BarChart, Users, FileText, CreditCard, Wallet, Upload } from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
+import { supabase } from '../../lib/supabaseClient';
+import crewImage from '../../assets/crew.webp';
 
 const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) => {
     const { contacts } = useCRM();
@@ -18,6 +20,9 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
         amountPaid: '0'
     });
     const [loading, setLoading] = useState(false);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(crewImage);
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -26,7 +31,7 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 value: initialData.amount?.replace(/[^0-9]/g, '') || '',
                 date: initialData.date || '',
                 client: initialData.clientName || '',
-                stage: initialData.stage || 'lead',
+                stage: initialData.status || 'lead',
                 contactIds: initialData.contacts?.map(c => c.id) || [],
                 reminderDate: initialData.reminder_date || '',
                 reminderTime: initialData.reminder_time || '09:00',
@@ -34,6 +39,7 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 paymentType: initialData.payment_type || 'one-time',
                 amountPaid: initialData.amount_paid?.toString() || '0'
             });
+            setImagePreview(initialData.clientLogo || crewImage);
         } else {
             setFormData({
                 title: '',
@@ -48,6 +54,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 paymentType: 'one-time',
                 amountPaid: '0'
             });
+            setImageFile(null);
+            setImagePreview(crewImage);
         }
     }, [initialData, isOpen]);
 
@@ -73,15 +81,62 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
         });
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const uploadImage = async () => {
+        if (!imageFile) return formData.clientLogo || crewImage;
+
+        setUploadingImage(true);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('User not authenticated');
+
+            const fileExt = imageFile.name.split('.').pop();
+            const fileName = `deal_${Date.now()}.${fileExt}`;
+            const filePath = `${user.id}/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('AVATAR')
+                .upload(filePath, imageFile);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('AVATAR')
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            return crewImage;
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
+            // Upload image if a new one was selected
+            const clientLogo = await uploadImage();
+
             const dealData = {
                 title: formData.title,
                 amount: `$${formData.value}`,
                 date: formData.date,
                 clientName: formData.client,
+                clientLogo: clientLogo,
                 status: formData.stage,
                 contactIds: formData.contactIds,
                 reminder_date: formData.reminderDate || null,
@@ -116,6 +171,34 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
 
                 <form onSubmit={handleSubmit}>
                     <div className="p-6 space-y-6">
+                        {/* Deal Image Upload */}
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Deal Image</label>
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Deal preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors">
+                                        <Upload className="w-4 h-4" />
+                                        <span className="text-sm font-medium">{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                            disabled={uploadingImage}
+                                        />
+                                    </label>
+                                    <p className="text-xs text-slate-500 mt-1">Default: crew.webp</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Deal Name</label>
                             <input

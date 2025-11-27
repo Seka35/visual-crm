@@ -36,11 +36,11 @@ export const CRMProvider = ({ children }) => {
 
     // --- Deals State ---
     const [deals, setDeals] = useState({
-        lead: { id: 'lead', title: 'Lead', color: 'bg-slate-400', items: [] },
-        qualified: { id: 'qualified', title: 'Qualified', color: 'bg-primary', items: [] },
-        proposal: { id: 'proposal', title: 'Proposal', color: 'bg-secondary', items: [] },
-        negotiation: { id: 'negotiation', title: 'Negotiation', color: 'bg-warning', items: [] },
-        won: { id: 'won', title: 'Won', color: 'bg-success', items: [] }
+        lead: { id: 'lead', title: 'Lead', color: 'bg-purple-500', items: [] },
+        qualified: { id: 'qualified', title: 'Qualified', color: 'bg-blue-500', items: [] },
+        proposal: { id: 'proposal', title: 'Proposal', color: 'bg-emerald-500', items: [] },
+        negotiation: { id: 'negotiation', title: 'Negotiation', color: 'bg-amber-500', items: [] },
+        won: { id: 'won', title: 'Won', color: 'bg-red-500', items: [] }
     });
 
     // --- Tasks State ---

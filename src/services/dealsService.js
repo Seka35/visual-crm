@@ -42,31 +42,31 @@ export const getDeals = async (workflowId = null) => {
             lead: {
                 id: 'lead',
                 title: 'Lead',
-                color: 'bg-slate-400',
+                color: 'bg-purple-500',
                 items: []
             },
             qualified: {
                 id: 'qualified',
                 title: 'Qualified',
-                color: 'bg-primary',
+                color: 'bg-blue-500',
                 items: []
             },
             proposal: {
                 id: 'proposal',
                 title: 'Proposal',
-                color: 'bg-secondary',
+                color: 'bg-emerald-500',
                 items: []
             },
             negotiation: {
                 id: 'negotiation',
                 title: 'Negotiation',
-                color: 'bg-warning',
+                color: 'bg-amber-500',
                 items: []
             },
             won: {
                 id: 'won',
                 title: 'Won',
-                color: 'bg-success',
+                color: 'bg-red-500',
                 items: []
             }
         };
@@ -80,6 +80,7 @@ export const getDeals = async (workflowId = null) => {
                 clientLogo: deal.client_logo,
                 amount: deal.amount,
                 probability: deal.probability,
+                status: deal.status,
                 date: deal.date,
                 ownerAvatar: deal.users?.avatar_url || deal.owner_avatar,
                 ownerName: deal.users?.full_name || deal.users?.email,
