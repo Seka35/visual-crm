@@ -17,7 +17,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
         reminderTime: '09:00',
         notes: '',
         paymentType: 'one-time',
-        amountPaid: '0'
+        amountPaid: '0',
+        clientLogo: ''
     });
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState(null);
@@ -37,7 +38,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 reminderTime: initialData.reminder_time || '09:00',
                 notes: initialData.notes || '',
                 paymentType: initialData.payment_type || 'one-time',
-                amountPaid: initialData.amount_paid?.toString() || '0'
+                amountPaid: initialData.amount_paid?.toString() || '0',
+                clientLogo: initialData.clientLogo || ''
             });
             setImagePreview(initialData.clientLogo || crewImage);
         } else {
@@ -52,7 +54,8 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 reminderTime: '09:00',
                 notes: '',
                 paymentType: 'one-time',
-                amountPaid: '0'
+                amountPaid: '0',
+                clientLogo: ''
             });
             setImageFile(null);
             setImagePreview(crewImage);
