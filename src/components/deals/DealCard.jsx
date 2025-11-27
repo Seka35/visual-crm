@@ -48,26 +48,42 @@ const DealCard = ({ deal, onClick }) => {
             </div>
 
             <div className="mb-3">
-                <p className="text-lg font-bold text-slate-800 dark:text-white">{deal.amount}</p>
+                <div className="flex items-center justify-between">
+                    <p className="text-lg font-bold text-slate-800 dark:text-white">{deal.amount}</p>
+                    {deal.payment_type && (
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${deal.payment_type === 'monthly' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300' :
+                                deal.payment_type === 'yearly' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300' :
+                                    'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                            }`}>
+                            {deal.payment_type === 'one-time' ? 'One-time' : deal.payment_type === 'monthly' ? 'Monthly' : 'Yearly'}
+                        </span>
+                    )}
+                </div>
+                {deal.amount_paid > 0 && (
+                    <div className="mt-2 space-y-1">
+                        <div className="flex justify-between text-xs">
+                            <span className="text-slate-500 dark:text-slate-400">Paid</span>
+                            <span className="font-medium text-green-600 dark:text-green-400">${deal.amount_paid}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                            <span className="text-slate-500 dark:text-slate-400">Remaining</span>
+                            <span className="font-medium text-orange-600 dark:text-orange-400">
+                                ${(parseFloat(deal.amount?.replace(/[^0-9.-]+/g, '') || 0) - deal.amount_paid).toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            <div className="space-y-2">
-                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                    <span>Probability</span>
-                    <span className="font-medium">{deal.probability}%</span>
+            {deal.notes && (
+                <div className="mb-3">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic">
+                        {deal.notes}
+                    </p>
                 </div>
-                <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                        className={cn(
-                            "h-full rounded-full transition-all duration-500",
-                            deal.probability > 75 ? "bg-success" :
-                                deal.probability > 40 ? "bg-primary" :
-                                    "bg-warning"
-                        )}
-                        style={{ width: `${deal.probability}%` }}
-                    />
-                </div>
-            </div>
+            )}
+
+
 
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50 dark:border-slate-800">
                 <div className="flex items-center gap-3">

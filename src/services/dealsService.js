@@ -86,7 +86,9 @@ export const getDeals = async (workflowId = null) => {
                 notes: deal.notes,
                 contacts: deal.deal_contacts?.map(dc => dc.contact) || [],
                 reminder_date: deal.reminder_date,
-                reminder_time: deal.reminder_time
+                reminder_time: deal.reminder_time,
+                payment_type: deal.payment_type,
+                amount_paid: deal.amount_paid
             };
 
             if (groupedDeals[deal.status]) {
@@ -153,7 +155,9 @@ export const addDeal = async (deal, workflowId = null) => {
             owner_avatar: deal.ownerAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
             notes: deal.notes || '',
             reminder_date: deal.reminder_date || null,
-            reminder_time: deal.reminder_time || null
+            reminder_time: deal.reminder_time || null,
+            payment_type: deal.payment_type || 'one-time',
+            amount_paid: deal.amount_paid || 0
         };
 
         const { data, error } = await supabase
@@ -213,6 +217,8 @@ export const updateDeal = async (id, updates) => {
         if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
         if (updates.reminder_date !== undefined) dbUpdates.reminder_date = updates.reminder_date;
         if (updates.reminder_time !== undefined) dbUpdates.reminder_time = updates.reminder_time;
+        if (updates.payment_type !== undefined) dbUpdates.payment_type = updates.payment_type;
+        if (updates.amount_paid !== undefined) dbUpdates.amount_paid = updates.amount_paid;
 
         const { data, error } = await supabase
             .from('deals')

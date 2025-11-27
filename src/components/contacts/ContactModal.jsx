@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Building, Mail, Phone, Tag, Upload, Camera } from 'lucide-react';
+import { X, User, Building, Mail, Phone, Tag, Upload, Camera, FileText } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useCRM } from '../../context/CRMContext';
 
@@ -13,6 +13,7 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
         email: '',
         phone: '',
         tags: '',
+        notes: '',
         avatar: null,
         taskIds: [],
         dealIds: []
@@ -43,6 +44,7 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                 email: initialData.email || '',
                 phone: initialData.phone || '',
                 tags: initialData.tags?.join(', ') || '',
+                notes: initialData.notes || '',
                 avatar: initialData.avatar || null,
                 taskIds: associatedTaskIds,
                 dealIds: associatedDealIds
@@ -141,6 +143,7 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                 email: formData.email,
                 phone: formData.phone,
                 tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+                notes: formData.notes,
                 avatar: formData.avatar,
                 taskIds: formData.taskIds,
                 dealIds: formData.dealIds
@@ -282,16 +285,16 @@ const ContactModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Tags</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Description</label>
                             <div className="relative">
-                                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                <input
-                                    type="text"
-                                    name="tags"
-                                    value={formData.tags}
+                                <FileText className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                                <textarea
+                                    name="notes"
+                                    value={formData.notes}
                                     onChange={handleChange}
-                                    placeholder="Add tags separated by comma..."
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
+                                    placeholder="Add a description..."
+                                    rows="3"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white resize-none"
                                 />
                             </div>
                         </div>

@@ -15,7 +15,7 @@ const ContactList = ({ contacts }) => {
                         <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Email</th>
                         <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Associations</th>
                         <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Rating</th>
-                        <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tags</th>
+                        <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Description</th>
                         <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                 </thead>
@@ -75,16 +75,7 @@ const ContactList = ({ contacts }) => {
                                     </div>
                                 </td>
                                 <td className="p-4">
-                                    <div className="flex gap-2">
-                                        {contact.tags.map((tag, i) => (
-                                            <span key={i} className={`text-[10px] font-bold px-2 py-1 rounded-lg ${tag === 'VIP' ? 'bg-purple-100 text-purple-600' :
-                                                tag === 'New' ? 'bg-primary/10 text-primary' :
-                                                    'bg-slate-100 text-slate-500'
-                                                }`}>
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    <p className="text-sm text-slate-500 truncate max-w-[200px]">{contact.notes || '-'}</p>
                                 </td>
                                 <td className="p-4 text-right">
                                     <button className="p-2 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors opacity-0 group-hover:opacity-100">

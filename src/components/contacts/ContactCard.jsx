@@ -81,15 +81,10 @@ const ContactCard = ({ contact }) => {
                 )}
             </div>
 
-            <div className="flex gap-2 mt-auto">
-                {contact.tags.map((tag, i) => (
-                    <span key={i} className={`text-[10px] font-bold px-2 py-1 rounded-lg ${tag === 'VIP' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300' :
-                        tag === 'New' ? 'bg-primary/10 text-primary' :
-                            'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-                        }`}>
-                        {tag}
-                    </span>
-                ))}
+            <div className="mt-auto w-full">
+                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic text-center">
+                    {contact.notes || ''}
+                </p>
             </div>
         </div>
     );

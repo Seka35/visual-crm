@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Building, Calendar, BarChart, Users } from 'lucide-react';
+import { X, DollarSign, Building, Calendar, BarChart, Users, FileText, CreditCard, Wallet } from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
 
 const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) => {
@@ -12,7 +12,10 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
         stage: 'lead',
         contactIds: [],
         reminderDate: '',
-        reminderTime: '09:00'
+        reminderTime: '09:00',
+        notes: '',
+        paymentType: 'one-time',
+        amountPaid: '0'
     });
     const [loading, setLoading] = useState(false);
 
@@ -26,7 +29,10 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 stage: initialData.stage || 'lead',
                 contactIds: initialData.contacts?.map(c => c.id) || [],
                 reminderDate: initialData.reminder_date || '',
-                reminderTime: initialData.reminder_time || '09:00'
+                reminderTime: initialData.reminder_time || '09:00',
+                notes: initialData.notes || '',
+                paymentType: initialData.payment_type || 'one-time',
+                amountPaid: initialData.amount_paid?.toString() || '0'
             });
         } else {
             setFormData({
@@ -37,7 +43,10 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 stage: 'lead',
                 contactIds: [],
                 reminderDate: '',
-                reminderTime: '09:00'
+                reminderTime: '09:00',
+                notes: '',
+                paymentType: 'one-time',
+                amountPaid: '0'
             });
         }
     }, [initialData, isOpen]);
@@ -76,7 +85,10 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 status: formData.stage,
                 contactIds: formData.contactIds,
                 reminder_date: formData.reminderDate || null,
-                reminder_time: formData.reminderTime || null
+                reminder_time: formData.reminderTime || null,
+                notes: formData.notes,
+                payment_type: formData.paymentType,
+                amount_paid: parseFloat(formData.amountPaid) || 0
             };
             await onSubmit(dealData);
             onClose();
@@ -143,6 +155,39 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                                         name="date"
                                         value={formData.date}
                                         onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Payment Type</label>
+                                <div className="relative">
+                                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <select
+                                        name="paymentType"
+                                        value={formData.paymentType}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white appearance-none"
+                                    >
+                                        <option value="one-time">One-time</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Amount Paid</label>
+                                <div className="relative">
+                                    <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <input
+                                        type="number"
+                                        name="amountPaid"
+                                        value={formData.amountPaid}
+                                        onChange={handleChange}
+                                        placeholder="0"
                                         className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
                                     />
                                 </div>
@@ -225,6 +270,21 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                                     <option value="negotiation">Negotiation</option>
                                     <option value="won">Won</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Notes</label>
+                            <div className="relative">
+                                <FileText className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                                <textarea
+                                    name="notes"
+                                    value={formData.notes}
+                                    onChange={handleChange}
+                                    placeholder="Add notes about this deal..."
+                                    rows="3"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white resize-none"
+                                />
                             </div>
                         </div>
 
