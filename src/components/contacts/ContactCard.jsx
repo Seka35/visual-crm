@@ -30,11 +30,11 @@ const ContactCard = ({ contact }) => {
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">{contact.name}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{contact.role}</p>
-                <div className="flex items-center gap-1 mt-1 text-warning">
-                    {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-3 h-3 ${i < contact.rating ? 'fill-current' : 'text-slate-200'}`} />
-                    ))}
-                </div>
+                {contact.notes && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 italic text-center">
+                        {contact.notes}
+                    </p>
+                )}
             </div>
 
             <div className="space-y-2 mb-4">
@@ -79,12 +79,6 @@ const ContactCard = ({ contact }) => {
                         </div>
                     </div>
                 )}
-            </div>
-
-            <div className="mt-auto w-full">
-                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic text-center">
-                    {contact.notes || ''}
-                </p>
             </div>
         </div>
     );
