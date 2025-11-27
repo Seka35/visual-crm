@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Plus, Filter, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import KanbanColumn from '../components/deals/KanbanColumn';
 import DealCard from '../components/deals/DealCard';
 import DealModal from '../components/deals/DealModal';
@@ -151,28 +151,12 @@ const Deals = () => {
     return (
         <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col gap-4 mb-6">
-                <div>
-                    <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">BIG SCORES</h2>
-                    <p className="text-slate-500 dark:text-slate-400">Plan the next big job.</p>
-                </div>
-
-                <div className="flex flex-col lg:flex-row gap-3 w-full">
-                    {/* Search and Filter Controls */}
-                    <div className="flex flex-col sm:flex-row gap-3 flex-1">
-                        <div className="relative group flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Search deals..."
-                                className="pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm w-full dark:text-white"
-                            />
-                        </div>
-                        <button className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                            <Filter className="w-5 h-5" />
-                        </button>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">BIG SCORES</h2>
+                        <p className="text-slate-500 dark:text-slate-400">Plan the next big job.</p>
                     </div>
 
-                    {/* Add Button */}
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"

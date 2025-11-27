@@ -13,13 +13,16 @@ import logoWhite from '../assets/logo_white.png';
 import logoBlack from '../assets/logo_black.png';
 
 const Header = ({ onMenuClick }) => {
-    const { user, signOut, deals } = useCRM();
+    const { user, signOut, deals, contacts, tasks, debts } = useCRM();
     const { currentWorkflow, workflows, switchWorkflow, notifications } = useWorkflow();
     const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isWorkflowOpen, setIsWorkflowOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { theme, setTheme } = useTheme();
 
     const toggleTheme = () => {
@@ -29,6 +32,105 @@ const Header = ({ onMenuClick }) => {
     const handleSignOut = async () => {
         await signOut();
         navigate('/login');
+    };
+
+    // Global search function
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+
+        if (!query.trim()) {
+            setSearchResults([]);
+            setIsSearchOpen(false);
+            return;
+        }
+
+        const results = [];
+        const lowerQuery = query.toLowerCase();
+
+        // Search contacts
+        contacts.forEach(contact => {
+            if (contact.name?.toLowerCase().includes(lowerQuery) ||
+                contact.company?.toLowerCase().includes(lowerQuery) ||
+                contact.email?.toLowerCase().includes(lowerQuery)) {
+                results.push({
+                    type: 'contact',
+                    id: contact.id,
+                    title: contact.name,
+                    subtitle: contact.company,
+                    path: '/contacts',
+                    data: contact
+                });
+            }
+        });
+
+        // Search deals
+        Object.values(deals).forEach(column => {
+            column.items.forEach(deal => {
+                if (deal.title?.toLowerCase().includes(lowerQuery) ||
+                    deal.client_name?.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'deal',
+                        id: deal.id,
+                        title: deal.title,
+                        subtitle: `${deal.client_name} - ${deal.amount}`,
+                        path: '/deals',
+                        data: deal
+                    });
+                }
+            });
+        });
+
+        // Search tasks
+        tasks.forEach(task => {
+            if (task.title?.toLowerCase().includes(lowerQuery) ||
+                task.description?.toLowerCase().includes(lowerQuery)) {
+                results.push({
+                    type: 'task',
+                    id: task.id,
+                    title: task.title,
+                    subtitle: task.description,
+                    path: '/tasks',
+                    data: task
+                });
+            }
+        });
+
+        // Search debts
+        Object.values(debts).forEach(column => {
+            column.items.forEach(debt => {
+                if (debt.borrower_name?.toLowerCase().includes(lowerQuery) ||
+                    debt.description?.toLowerCase().includes(lowerQuery)) {
+                    results.push({
+                        type: 'debt',
+                        id: debt.id,
+                        title: debt.borrower_name,
+                        subtitle: `${debt.amount_lent} - ${debt.description || 'No description'}`,
+                        path: '/debts',
+                        data: debt
+                    });
+                }
+            });
+        });
+
+        setSearchResults(results.slice(0, 8)); // Limit to 8 results
+        setIsSearchOpen(results.length > 0);
+    };
+
+    const handleResultClick = (result) => {
+        navigate(result.path);
+        setSearchQuery('');
+        setSearchResults([]);
+        setIsSearchOpen(false);
+    };
+
+    const getResultIcon = (type) => {
+        switch (type) {
+            case 'contact': return '👤';
+            case 'deal': return '💼';
+            case 'task': return '✓';
+            case 'debt': return '💰';
+            default: return '📄';
+        }
     };
 
     // Get user display name and email
@@ -65,10 +167,39 @@ const Header = ({ onMenuClick }) => {
                         <input
                             type="text"
                             placeholder="Search anything... (Cmd+K)"
+                            value={searchQuery}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            onFocus={() => searchQuery && setIsSearchOpen(true)}
                             className="w-full pl-10 pr-4 py-2.5 bg-slate-100/50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none text-slate-600 dark:text-slate-200 placeholder:text-slate-400"
                         />
+
+                        {/* Search Results Dropdown */}
+                        {isSearchOpen && searchResults.length > 0 && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsSearchOpen(false)} />
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {searchResults.map((result) => (
+                                        <button
+                                            key={`${result.type}-${result.id}`}
+                                            onClick={() => handleResultClick(result)}
+                                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left border-b border-slate-100 dark:border-slate-800 last:border-0"
+                                        >
+                                            <span className="text-2xl">{getResultIcon(result.type)}</span>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-slate-800 dark:text-slate-100 truncate">{result.title}</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{result.subtitle}</p>
+                                            </div>
+                                            <span className="text-xs text-slate-400 uppercase">{result.type}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
-                    <button className="sm:hidden p-2 hover:bg-slate-100 rounded-xl text-slate-600">
+                    <button
+                        onClick={() => {/* Mobile search modal can be added later */ }}
+                        className="sm:hidden p-2 hover:bg-slate-100 rounded-xl text-slate-600"
+                    >
                         <Search className="w-6 h-6" />
                     </button>
                 </div>
