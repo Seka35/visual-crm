@@ -94,7 +94,7 @@ const Calendar = () => {
                 </div>
             </div>
 
-            <div className="glass-card rounded-2xl flex-1 flex flex-col overflow-hidden dark:bg-slate-900 dark:border-slate-800">
+            <div className="glass-card rounded-2xl flex-1 flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] dark:bg-slate-900 dark:border-slate-800">
                 {/* Header */}
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
