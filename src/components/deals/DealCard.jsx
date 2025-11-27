@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Calendar, MoreHorizontal } from 'lucide-react';
+import { Calendar, MoreHorizontal, Bell } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const DealCard = ({ deal, onClick }) => {
@@ -70,9 +70,17 @@ const DealCard = ({ deal, onClick }) => {
             </div>
 
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50 dark:border-slate-800">
-                <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{deal.date}</span>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{deal.date}</span>
+                    </div>
+                    {deal.reminder_date && (
+                        <div className="flex items-center gap-1.5 text-xs text-amber-500 font-medium bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
+                            <Bell className="w-3 h-3" />
+                            <span>{deal.reminder_date} {deal.reminder_time?.slice(0, 5)}</span>
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center gap-2">
                     {deal.contacts && deal.contacts.length > 0 && (

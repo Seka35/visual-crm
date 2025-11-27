@@ -10,7 +10,9 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
         date: '',
         client: '',
         stage: 'lead',
-        contactIds: []
+        contactIds: [],
+        reminderDate: '',
+        reminderTime: '09:00'
     });
     const [loading, setLoading] = useState(false);
 
@@ -22,7 +24,9 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 date: initialData.date || '',
                 client: initialData.clientName || '',
                 stage: initialData.stage || 'lead',
-                contactIds: initialData.contacts?.map(c => c.id) || []
+                contactIds: initialData.contacts?.map(c => c.id) || [],
+                reminderDate: initialData.reminder_date || '',
+                reminderTime: initialData.reminder_time || '09:00'
             });
         } else {
             setFormData({
@@ -31,7 +35,9 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 date: new Date().toISOString().split('T')[0],
                 client: '',
                 stage: 'lead',
-                contactIds: []
+                contactIds: [],
+                reminderDate: '',
+                reminderTime: '09:00'
             });
         }
     }, [initialData, isOpen]);
@@ -68,7 +74,9 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                 date: formData.date,
                 clientName: formData.client,
                 status: formData.stage,
-                contactIds: formData.contactIds
+                contactIds: formData.contactIds,
+                reminder_date: formData.reminderDate || null,
+                reminder_time: formData.reminderTime || null
             };
             await onSubmit(dealData);
             onClose();
@@ -217,6 +225,32 @@ const DealModal = ({ isOpen, onClose, initialData = null, onSubmit, onDelete }) 
                                     <option value="negotiation">Negotiation</option>
                                     <option value="won">Won</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Set Reminder (Date)</label>
+                                <div className="relative">
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <input
+                                        type="date"
+                                        name="reminderDate"
+                                        value={formData.reminderDate}
+                                        onChange={handleChange}
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Time</label>
+                                <input
+                                    type="time"
+                                    name="reminderTime"
+                                    value={formData.reminderTime}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-slate-700 transition-all outline-none text-slate-600 dark:text-white"
+                                />
                             </div>
                         </div>
                     </div>

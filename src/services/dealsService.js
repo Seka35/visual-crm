@@ -84,7 +84,9 @@ export const getDeals = async (workflowId = null) => {
                 ownerAvatar: deal.users?.avatar_url || deal.owner_avatar,
                 ownerName: deal.users?.full_name || deal.users?.email,
                 notes: deal.notes,
-                contacts: deal.deal_contacts?.map(dc => dc.contact) || []
+                contacts: deal.deal_contacts?.map(dc => dc.contact) || [],
+                reminder_date: deal.reminder_date,
+                reminder_time: deal.reminder_time
             };
 
             if (groupedDeals[deal.status]) {
@@ -149,7 +151,9 @@ export const addDeal = async (deal, workflowId = null) => {
             status: deal.status || 'lead',
             date: deal.date || new Date().toLocaleDateString(),
             owner_avatar: deal.ownerAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
-            notes: deal.notes || ''
+            notes: deal.notes || '',
+            reminder_date: deal.reminder_date || null,
+            reminder_time: deal.reminder_time || null
         };
 
         const { data, error } = await supabase
@@ -207,6 +211,8 @@ export const updateDeal = async (id, updates) => {
         if (updates.status !== undefined) dbUpdates.status = updates.status;
         if (updates.date !== undefined) dbUpdates.date = updates.date;
         if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+        if (updates.reminder_date !== undefined) dbUpdates.reminder_date = updates.reminder_date;
+        if (updates.reminder_time !== undefined) dbUpdates.reminder_time = updates.reminder_time;
 
         const { data, error } = await supabase
             .from('deals')
