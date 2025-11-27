@@ -172,7 +172,13 @@ const AIChat = ({ isOpen, onClose }) => {
                         properties: {
                             title: { type: "string", description: "Title of the deal" },
                             amount: { type: "string", description: "Value of the deal (e.g. $5,000)" },
-                            clientName: { type: "string", description: "Name of the client" }
+                            clientName: { type: "string", description: "Name of the client" },
+                            status: { type: "string", enum: ["lead", "qualified", "proposal", "negotiation", "won", "lost"], description: "Initial status/stage" },
+                            probability: { type: "number", description: "Probability of winning (0-100)" },
+                            notes: { type: "string", description: "Notes about the deal" },
+                            reminderDate: { type: "string", description: "Reminder date (YYYY-MM-DD)" },
+                            reminderTime: { type: "string", description: "Reminder time (e.g. 14:00)" },
+                            contactNames: { type: "array", items: { type: "string" }, description: "List of contact names to associate with this deal" }
                         },
                         required: ["title"]
                     }
@@ -193,11 +199,32 @@ const AIChat = ({ isOpen, onClose }) => {
                                 properties: {
                                     title: { type: "string" },
                                     amount: { type: "string" },
-                                    clientName: { type: "string" }
+                                    clientName: { type: "string" },
+                                    status: { type: "string", enum: ["lead", "qualified", "proposal", "negotiation", "won", "lost"] },
+                                    probability: { type: "number" },
+                                    notes: { type: "string" },
+                                    reminderDate: { type: "string" },
+                                    reminderTime: { type: "string" }
                                 }
                             }
                         },
                         required: ["title", "updates"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "manage_deal_contacts",
+                    description: "Add or remove contacts from a deal",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            dealTitle: { type: "string", description: "Title of the deal" },
+                            action: { type: "string", enum: ["add", "remove"], description: "Action to perform" },
+                            contactName: { type: "string", description: "Name of the contact to add/remove" }
+                        },
+                        required: ["dealTitle", "action", "contactName"]
                     }
                 }
             },
@@ -255,8 +282,10 @@ const AIChat = ({ isOpen, onClose }) => {
                         type: "object",
                         properties: {
                             title: { type: "string", description: "Description of the task" },
-                            date: { type: "string", description: "Due date (e.g. Today, Tomorrow)" },
-                            priority: { type: "string", enum: ["low", "medium", "high"] }
+                            date: { type: "string", description: "Due date (e.g. Today, Tomorrow, YYYY-MM-DD)" },
+                            priority: { type: "string", enum: ["low", "medium", "high"] },
+                            reminderTime: { type: "string", description: "Reminder time (e.g. 14:00)" },
+                            contactNames: { type: "array", items: { type: "string" }, description: "List of contact names to associate with this task" }
                         },
                         required: ["title"]
                     }
@@ -277,11 +306,28 @@ const AIChat = ({ isOpen, onClose }) => {
                                 properties: {
                                     title: { type: "string" },
                                     priority: { type: "string", enum: ["low", "medium", "high"] },
-                                    date: { type: "string" }
+                                    date: { type: "string" },
+                                    reminderTime: { type: "string" }
                                 }
                             }
                         },
                         required: ["title", "updates"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "manage_task_contacts",
+                    description: "Add or remove contacts from a task",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            taskTitle: { type: "string", description: "Title of the task" },
+                            action: { type: "string", enum: ["add", "remove"], description: "Action to perform" },
+                            contactName: { type: "string", description: "Name of the contact to add/remove" }
+                        },
+                        required: ["taskTitle", "action", "contactName"]
                     }
                 }
             },
@@ -413,7 +459,8 @@ const AIChat = ({ isOpen, onClose }) => {
                             person: { type: "string", description: "Name of the person" },
                             amount: { type: "number", description: "Amount of money" },
                             description: { type: "string", description: "Description of the debt" },
-                            dueDate: { type: "string", description: "Due date (YYYY-MM-DD)" }
+                            dueDate: { type: "string", description: "Due date (YYYY-MM-DD)" },
+                            reminderDate: { type: "string", description: "Reminder date (YYYY-MM-DD)" }
                         },
                         required: ["person", "amount"]
                     }
@@ -624,6 +671,15 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                     const functionName = toolCall.function.name;
                     const functionArgs = JSON.parse(toolCall.function.arguments);
 
+                    // Helper to resolve contact names to IDs
+                    const resolveContactIds = (names) => {
+                        if (!names || !Array.isArray(names)) return [];
+                        return names.map(name => {
+                            const contact = contacts.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+                            return contact ? contact.id : null;
+                        }).filter(id => id !== null);
+                    };
+
                     // --- CONTACTS ---
                     if (functionName === "add_contact") {
                         const result = await addContact(functionArgs);
@@ -657,17 +713,54 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
 
                     // --- DEALS ---
                     else if (functionName === "add_deal") {
-                        const result = await addDeal(functionArgs);
+                        const dealData = {
+                            ...functionArgs,
+                            contactIds: resolveContactIds(functionArgs.contactNames),
+                            reminder_date: functionArgs.reminderDate,
+                            reminder_time: functionArgs.reminderTime
+                        };
+                        const result = await addDeal(dealData);
                         actionResult = result ? `Added deal: ${functionArgs.title}` : "Failed to add deal.";
                     } else if (functionName === "update_deal") {
                         let allDeals = [];
                         Object.values(deals).forEach(col => { if (col.items) allDeals = [...allDeals, ...col.items]; });
                         const deal = allDeals.find(d => d.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
                         if (deal) {
-                            await updateDeal(deal.id, functionArgs.updates);
+                            const updates = {
+                                ...functionArgs.updates,
+                                reminder_date: functionArgs.updates.reminderDate,
+                                reminder_time: functionArgs.updates.reminderTime
+                            };
+                            await updateDeal(deal.id, updates);
                             actionResult = `Updated deal: ${deal.title}`;
                         } else {
                             actionResult = `Could not find deal: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "manage_deal_contacts") {
+                        let allDeals = [];
+                        Object.values(deals).forEach(col => { if (col.items) allDeals = [...allDeals, ...col.items]; });
+                        const deal = allDeals.find(d => d.title.toLowerCase().includes(functionArgs.dealTitle.toLowerCase()));
+
+                        if (deal) {
+                            const contactIds = resolveContactIds([functionArgs.contactName]);
+                            if (contactIds.length > 0) {
+                                const contactId = contactIds[0];
+                                const currentContactIds = deal.contacts ? deal.contacts.map(c => c.id) : [];
+                                let newContactIds = [...currentContactIds];
+
+                                if (functionArgs.action === 'add') {
+                                    if (!newContactIds.includes(contactId)) newContactIds.push(contactId);
+                                } else {
+                                    newContactIds = newContactIds.filter(id => id !== contactId);
+                                }
+
+                                await updateDeal(deal.id, { contactIds: newContactIds });
+                                actionResult = `${functionArgs.action === 'add' ? 'Added' : 'Removed'} contact ${functionArgs.contactName} ${functionArgs.action === 'add' ? 'to' : 'from'} deal ${deal.title}`;
+                            } else {
+                                actionResult = `Could not find contact: ${functionArgs.contactName}`;
+                            }
+                        } else {
+                            actionResult = `Could not find deal: ${functionArgs.dealTitle}`;
                         }
                     } else if (functionName === "move_deal") {
                         let allDeals = [];
@@ -717,15 +810,45 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
 
                     // --- TASKS ---
                     else if (functionName === "add_task") {
-                        const result = await addTask(functionArgs);
+                        const taskData = {
+                            ...functionArgs,
+                            contactIds: resolveContactIds(functionArgs.contactNames),
+                            reminderTime: functionArgs.reminderTime
+                        };
+                        const result = await addTask(taskData);
                         actionResult = result ? `Added task: ${functionArgs.title}` : "Failed to add task.";
                     } else if (functionName === "update_task") {
                         const task = tasks.find(t => t.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
                         if (task) {
-                            await updateTask(task.id, functionArgs.updates);
+                            const updates = { ...functionArgs.updates };
+                            if (updates.reminderTime) updates.reminderTime = updates.reminderTime;
+                            await updateTask(task.id, updates);
                             actionResult = `Updated task: ${task.title}`;
                         } else {
                             actionResult = `Could not find task: ${functionArgs.title}`;
+                        }
+                    } else if (functionName === "manage_task_contacts") {
+                        const task = tasks.find(t => t.title.toLowerCase().includes(functionArgs.taskTitle.toLowerCase()));
+                        if (task) {
+                            const contactIds = resolveContactIds([functionArgs.contactName]);
+                            if (contactIds.length > 0) {
+                                const contactId = contactIds[0];
+                                const currentContactIds = task.contacts ? task.contacts.map(c => c.id) : [];
+                                let newContactIds = [...currentContactIds];
+
+                                if (functionArgs.action === 'add') {
+                                    if (!newContactIds.includes(contactId)) newContactIds.push(contactId);
+                                } else {
+                                    newContactIds = newContactIds.filter(id => id !== contactId);
+                                }
+
+                                await updateTask(task.id, { contactIds: newContactIds });
+                                actionResult = `${functionArgs.action === 'add' ? 'Added' : 'Removed'} contact ${functionArgs.contactName} ${functionArgs.action === 'add' ? 'to' : 'from'} task ${task.title}`;
+                            } else {
+                                actionResult = `Could not find contact: ${functionArgs.contactName}`;
+                            }
+                        } else {
+                            actionResult = `Could not find task: ${functionArgs.taskTitle}`;
                         }
                     } else if (functionName === "toggle_task") {
                         const task = tasks.find(t => t.title.toLowerCase().includes(functionArgs.title.toLowerCase()));
@@ -856,7 +979,8 @@ IMPORTANT: Despite your vulgar and aggressive language, you MUST correctly accom
                             borrowerName: functionArgs.person,
                             amountLent: functionArgs.amount.toString(),
                             description: functionArgs.description,
-                            dateLent: functionArgs.dueDate
+                            dateLent: functionArgs.dueDate,
+                            reminderDate: functionArgs.reminderDate
                         });
                         actionResult = `Added debt for ${functionArgs.person}: $${functionArgs.amount}`;
                     } else if (functionName === "delete_debt") {
