@@ -89,7 +89,8 @@ export const getDeals = async (workflowId = null) => {
                 reminder_date: deal.reminder_date,
                 reminder_time: deal.reminder_time,
                 payment_type: deal.payment_type,
-                amount_paid: deal.amount_paid
+                amount_paid: deal.amount_paid,
+                related_task_id: deal.related_task_id
             };
 
             if (groupedDeals[deal.status]) {
@@ -220,6 +221,7 @@ export const updateDeal = async (id, updates) => {
         if (updates.reminder_time !== undefined) dbUpdates.reminder_time = updates.reminder_time;
         if (updates.payment_type !== undefined) dbUpdates.payment_type = updates.payment_type;
         if (updates.amount_paid !== undefined) dbUpdates.amount_paid = updates.amount_paid;
+        if (updates.related_task_id !== undefined) dbUpdates.related_task_id = updates.related_task_id;
 
         const { data, error } = await supabase
             .from('deals')

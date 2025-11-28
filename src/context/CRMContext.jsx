@@ -196,67 +196,6 @@ export const CRMProvider = ({ children }) => {
         }
     };
 
-    // --- Deals Functions ---
-    const loadDeals = async () => {
-        const { data, error } = await dealsService.getDeals(currentWorkflowId);
-        if (error) {
-            console.error('Error loading deals:', error);
-            setError(error.message);
-        } else {
-            setDeals(data);
-        }
-    };
-
-    const addDeal = async (deal) => {
-        // Ensure we are passing the currentWorkflowId to the service
-        const { data, error } = await dealsService.addDeal(deal, currentWorkflowId);
-        if (error) {
-            console.error('Error adding deal:', error);
-            setError(error.message);
-            return null;
-        } else {
-            await loadDeals(); // Reload to get fresh grouped data
-            await loadContacts();
-            return data;
-        }
-    };
-
-    const updateDeal = async (id, updates) => {
-        const { data, error } = await dealsService.updateDeal(id, updates);
-        if (error) {
-            console.error('Error updating deal:', error);
-            setError(error.message);
-        } else {
-            await loadDeals(); // Reload to get fresh grouped data
-            await loadContacts();
-        }
-    };
-
-    const updateDeals = async (newDealsState) => {
-        // This is called during drag & drop
-        // We need to update the status of moved deals
-        setDeals(newDealsState);
-    };
-
-    const moveDeal = async (dealId, newStatus) => {
-        const { error } = await dealsService.moveDeal(dealId, newStatus);
-        if (error) {
-            console.error('Error moving deal:', error);
-            setError(error.message);
-        }
-    };
-
-    const deleteDeal = async (id) => {
-        const { error } = await dealsService.deleteDeal(id);
-        if (error) {
-            console.error('Error deleting deal:', error);
-            setError(error.message);
-        } else {
-            await loadDeals();
-            await loadContacts();
-        }
-    };
-
     // --- Tasks Functions ---
     const loadTasks = async () => {
         const { data, error } = await tasksService.getTasks(currentWorkflowId);
@@ -312,6 +251,148 @@ export const CRMProvider = ({ children }) => {
             await loadContacts();
         }
     };
+
+    // --- Deals Functions ---
+    const loadDeals = async () => {
+        const { data, error } = await dealsService.getDeals(currentWorkflowId);
+        if (error) {
+            console.error('Error loading deals:', error);
+            setError(error.message);
+        } else {
+            setDeals(data);
+        }
+    };
+
+    const addDeal = async (deal) => {
+        // Ensure we are passing the currentWorkflowId to the service
+        const { data, error } = await dealsService.addDeal(deal, currentWorkflowId);
+        if (error) {
+            console.error('Error adding deal:', error);
+            setError(error.message);
+            return null;
+        } else {
+            // Sync to Tasks if reminder is set
+            if (deal.reminder_date) {
+                try {
+                    const taskData = {
+                        title: `Follow up on deal: ${deal.title}`,
+                        description: `Reminder for deal: ${deal.title}\nNotes: ${deal.notes || ''}`,
+                        dueDate: deal.reminder_date,
+                        reminderTime: deal.reminder_time || '09:00',
+                        contactIds: deal.contactIds || [],
+                        project: 'Deals',
+                        priority: 'high'
+                    };
+
+                    const { data: taskDataResponse, error: taskError } = await addTask(taskData);
+
+                    if (taskDataResponse && !taskError) {
+                        await dealsService.updateDeal(data.id, { related_task_id: taskDataResponse.id });
+                    }
+                } catch (e) {
+                    console.error("Error syncing deal to task", e);
+                }
+            }
+
+            await loadDeals(); // Reload to get fresh grouped data
+            await loadContacts();
+            return data;
+        }
+    };
+
+    const updateDeal = async (id, updates) => {
+        // Find current deal for context
+        let currentDeal = null;
+        for (const key in deals) {
+            const found = deals[key].items.find(d => d.id === id);
+            if (found) {
+                currentDeal = found;
+                break;
+            }
+        }
+
+        const { data, error } = await dealsService.updateDeal(id, updates);
+        if (error) {
+            console.error('Error updating deal:', error);
+            setError(error.message);
+        } else {
+            // Sync logic
+            if (currentDeal) {
+                try {
+                    const newDate = updates.reminder_date !== undefined ? updates.reminder_date : currentDeal.reminder_date;
+                    const newTime = updates.reminder_time !== undefined ? updates.reminder_time : currentDeal.reminder_time;
+                    const hasReminder = !!newDate;
+                    const hadReminder = !!currentDeal.reminder_date;
+                    const taskId = currentDeal.related_task_id;
+
+                    if (hasReminder && (!hadReminder || !taskId)) {
+                        // Created reminder OR Reminder exists but no task (legacy) -> Create task
+                        const taskData = {
+                            title: `Follow up on deal: ${updates.title || currentDeal.title}`,
+                            description: `Reminder for deal: ${updates.title || currentDeal.title}`,
+                            dueDate: newDate,
+                            reminderTime: newTime || '09:00',
+                            contactIds: updates.contactIds || currentDeal.contactIds || [],
+                            project: 'Deals',
+                            priority: 'high'
+                        };
+                        const { data: taskRes } = await addTask(taskData);
+                        if (taskRes) {
+                            await dealsService.updateDeal(id, { related_task_id: taskRes.id });
+                        }
+                    } else if (!hasReminder && hadReminder) {
+                        // Removed reminder -> Delete task
+                        if (taskId) {
+                            await deleteTask(taskId);
+                            await dealsService.updateDeal(id, { related_task_id: null });
+                        }
+                    } else if (hasReminder && taskId) {
+                        // Updated reminder -> Update task
+                        // Check if relevant fields changed
+                        if (updates.reminder_date || updates.reminder_time || updates.title) {
+                            await updateTask(taskId, {
+                                dueDate: newDate,
+                                reminderTime: newTime,
+                                title: updates.title ? `Follow up on deal: ${updates.title}` : undefined
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error syncing deal update to task", e);
+                }
+            }
+
+            await loadDeals(); // Reload to get fresh grouped data
+            await loadContacts();
+        }
+    };
+
+    const updateDeals = async (newDealsState) => {
+        // This is called during drag & drop
+        // We need to update the status of moved deals
+        setDeals(newDealsState);
+    };
+
+    const moveDeal = async (dealId, newStatus) => {
+        const { error } = await dealsService.moveDeal(dealId, newStatus);
+        if (error) {
+            console.error('Error moving deal:', error);
+            setError(error.message);
+        }
+    };
+
+    const deleteDeal = async (id) => {
+        const { error } = await dealsService.deleteDeal(id);
+        if (error) {
+            console.error('Error deleting deal:', error);
+            setError(error.message);
+        } else {
+            await loadDeals();
+            await loadContacts();
+        }
+    };
+
+
 
     // --- Events Functions ---
     const loadEvents = async () => {
