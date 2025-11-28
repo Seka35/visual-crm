@@ -6,6 +6,7 @@ import * as eventsService from '../services/eventsService';
 
 import * as debtsService from '../services/debtsService';
 import * as authService from '../services/authService';
+import * as workflowService from '../services/workflowService';
 import { useWorkflow } from './WorkflowContext';
 
 const CRMContext = createContext();
@@ -213,6 +214,20 @@ export const CRMProvider = ({ children }) => {
             console.error('Error adding task:', error);
             await loadTasks();
             await loadContacts();
+            return { data: null, error };
+        } else {
+            // Create notification if reminder is set and not skipped
+            if (task.dueDate && !task.skipNotification && user) {
+                await workflowService.createNotification({
+                    user_id: user.id,
+                    type: 'reminder',
+                    content: `Mission Reminder: ${task.title}`,
+                    data: { type: 'task', id: data.id, path: '/tasks' }
+                });
+            }
+
+            setTasks(prev => [data, ...prev]);
+            return { data, error: null };
         }
     };
 
@@ -247,10 +262,6 @@ export const CRMProvider = ({ children }) => {
                     }
                 }
 
-                if (debtFound) {
-                    await debtsService.updateDebt(debtFound.id, { reminderDate: null });
-                    await loadDebts();
-                }
             }
         }
     };
@@ -261,6 +272,16 @@ export const CRMProvider = ({ children }) => {
             console.error('Error updating task:', error);
             setError(error.message);
         } else {
+            // Create notification if reminder is set/changed and not skipped
+            if (updates.dueDate && !updates.skipNotification && user) {
+                await workflowService.createNotification({
+                    user_id: user.id,
+                    type: 'reminder',
+                    content: `Mission Updated: ${updates.title || data.title}`,
+                    data: { type: 'task', id: id, path: '/tasks' }
+                });
+            }
+
             await loadTasks();
             await loadContacts();
         }
@@ -306,13 +327,24 @@ export const CRMProvider = ({ children }) => {
                         reminderTime: deal.reminder_time || '09:00',
                         contactIds: deal.contactIds || [],
                         project: 'Deals',
-                        priority: 'high'
+                        priority: 'high',
+                        skipNotification: true // Skip task notification, we handle it here
                     };
 
                     const { data: taskDataResponse, error: taskError } = await addTask(taskData);
 
                     if (taskDataResponse && !taskError) {
                         await dealsService.updateDeal(data.id, { related_task_id: taskDataResponse.id });
+                    }
+
+                    // Create Deal Notification
+                    if (user) {
+                        await workflowService.createNotification({
+                            user_id: user.id,
+                            type: 'reminder',
+                            content: `Deal Reminder: ${deal.title}`,
+                            data: { type: 'deal', id: data.id, path: '/deals' }
+                        });
                     }
                 } catch (e) {
                     console.error("Error syncing deal to task", e);
@@ -359,11 +391,22 @@ export const CRMProvider = ({ children }) => {
                             reminderTime: newTime || '09:00',
                             contactIds: updates.contactIds || currentDeal.contactIds || [],
                             project: 'Deals',
-                            priority: 'high'
+                            priority: 'high',
+                            skipNotification: true
                         };
                         const { data: taskRes } = await addTask(taskData);
                         if (taskRes) {
                             await dealsService.updateDeal(id, { related_task_id: taskRes.id });
+
+                            // Create Notification
+                            if (user) {
+                                await workflowService.createNotification({
+                                    user_id: user.id,
+                                    type: 'reminder',
+                                    content: `Deal Reminder: ${updates.title || currentDeal.title}`,
+                                    data: { type: 'deal', id: id, path: '/deals' }
+                                });
+                            }
                         }
                     } else if (!hasReminder && hadReminder) {
                         // Removed reminder -> Delete task ONLY if it's not completed
@@ -383,8 +426,19 @@ export const CRMProvider = ({ children }) => {
                             await updateTask(taskId, {
                                 dueDate: newDate,
                                 reminderTime: newTime,
-                                title: updates.title ? `Follow up on deal: ${updates.title}` : undefined
+                                title: updates.title ? `Follow up on deal: ${updates.title}` : undefined,
+                                skipNotification: true
                             });
+
+                            // Create Notification
+                            if (user) {
+                                await workflowService.createNotification({
+                                    user_id: user.id,
+                                    type: 'reminder',
+                                    content: `Deal Reminder Updated: ${updates.title || currentDeal.title}`,
+                                    data: { type: 'deal', id: id, path: '/deals' }
+                                });
+                            }
                         }
                     }
                 } catch (e) {
@@ -502,13 +556,24 @@ export const CRMProvider = ({ children }) => {
                         reminderTime: timePart || '09:00',
                         contactIds: [], // Could link to contact if we had contact selection
                         project: 'Debts',
-                        priority: 'high'
+                        priority: 'high',
+                        skipNotification: true // Skip task notification
                     };
 
                     const { data: taskDataResponse, error: taskError } = await addTask(taskData);
 
                     if (taskDataResponse && !taskError) {
                         await debtsService.updateDebt(data.id, { related_task_id: taskDataResponse.id });
+                    }
+
+                    // Create Debt Notification
+                    if (user) {
+                        await workflowService.createNotification({
+                            user_id: user.id,
+                            type: 'reminder',
+                            content: `Debt Reminder: ${debt.borrowerName}`,
+                            data: { type: 'debt', id: data.id, path: '/debts' }
+                        });
                     }
                 } catch (e) {
                     console.error("Error syncing debt to task", e);
@@ -560,11 +625,22 @@ export const CRMProvider = ({ children }) => {
                             reminderTime: timePart || '09:00',
                             contactIds: [],
                             project: 'Debts',
-                            priority: 'high'
+                            priority: 'high',
+                            skipNotification: true
                         };
                         const { data: taskRes } = await addTask(taskData);
                         if (taskRes) {
                             await debtsService.updateDebt(id, { related_task_id: taskRes.id });
+
+                            // Create Notification
+                            if (user) {
+                                await workflowService.createNotification({
+                                    user_id: user.id,
+                                    type: 'reminder',
+                                    content: `Debt Reminder: ${updates.borrowerName || currentDebt.borrower_name}`,
+                                    data: { type: 'debt', id: id, path: '/debts' }
+                                });
+                            }
                         }
                     } else if (!hasNewReminder && hadReminder && updates.reminderDate === null) {
                         // Removed reminder -> Delete task ONLY if it's not completed
@@ -583,8 +659,19 @@ export const CRMProvider = ({ children }) => {
                         await updateTask(taskId, {
                             dueDate: datePart,
                             reminderTime: timePart,
-                            title: updates.borrowerName ? `Follow up on debt: ${updates.borrowerName}` : undefined
+                            title: updates.borrowerName ? `Follow up on debt: ${updates.borrowerName}` : undefined,
+                            skipNotification: true
                         });
+
+                        // Create Notification
+                        if (user) {
+                            await workflowService.createNotification({
+                                user_id: user.id,
+                                type: 'reminder',
+                                content: `Debt Reminder Updated: ${updates.borrowerName || currentDebt.borrower_name}`,
+                                data: { type: 'debt', id: id, path: '/debts' }
+                            });
+                        }
                     }
                 } catch (e) {
                     console.error("Error syncing debt update to task", e);

@@ -117,7 +117,14 @@ export const WorkflowProvider = ({ children }) => {
             acceptJoinRequest,
             loadNotifications,
             deleteWorkflow,
-            updateWorkflow // Expose updateWorkflow
+            updateWorkflow,
+            markAllNotificationsRead: async () => {
+                const user = supabase.auth.getUser();
+                if (user?.data?.user?.id) {
+                    await workflowService.markAllNotificationsRead(user.data.user.id);
+                    loadNotifications();
+                }
+            }
         }}>
             {children}
         </WorkflowContext.Provider>

@@ -155,6 +155,24 @@ export const markNotificationRead = async (id) => {
     return { data, error };
 };
 
+export const markAllNotificationsRead = async (userId) => {
+    const { data, error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', userId)
+        .eq('read', false);
+    return { data, error };
+};
+
+export const createNotification = async (notification) => {
+    const { data, error } = await supabase
+        .from('notifications')
+        .insert([notification])
+        .select()
+        .single();
+    return { data, error };
+};
+
 export const updateWorkflow = async (id, updates) => {
     const { data, error } = await supabase
         .from('workflows')
