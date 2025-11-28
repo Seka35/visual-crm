@@ -1,14 +1,26 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Phone, Mail, Building, Star, MoreHorizontal } from 'lucide-react';
 import crewImage from '../../assets/crew.webp';
 import { useCRM } from '../../context/CRMContext';
 
 const ContactCard = ({ contact }) => {
     const { tasks, deals } = useCRM();
+    const navigate = useNavigate();
 
     // Calculate associations from global state to ensure consistency with Modal
     const associatedTasks = tasks.filter(t => t.contacts?.some(c => c.id === contact.id));
     const associatedDeals = Object.values(deals).flatMap(s => s.items).filter(d => d.contacts?.some(c => c.id === contact.id));
+
+    const handleDealClick = (e, dealId) => {
+        e.stopPropagation();
+        navigate(`/deals?openId=${dealId}`);
+    };
+
+    const handleTaskClick = (e, taskId) => {
+        e.stopPropagation();
+        navigate(`/tasks?openId=${taskId}`);
+    };
 
     return (
         <div className="glass-card p-5 rounded-2xl group relative hover:-translate-y-1 transition-all duration-300 dark:bg-slate-900/50 dark:border-slate-800">
@@ -58,7 +70,11 @@ const ContactCard = ({ contact }) => {
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deals</p>
                         <div className="space-y-1">
                             {associatedDeals.map(deal => (
-                                <div key={deal.id} className="flex justify-between items-center text-xs bg-purple-50 dark:bg-purple-900/20 p-2 rounded-lg border border-purple-100 dark:border-purple-800/50">
+                                <div
+                                    key={deal.id}
+                                    onClick={(e) => handleDealClick(e, deal.id)}
+                                    className="flex justify-between items-center text-xs bg-purple-50 dark:bg-purple-900/20 p-2 rounded-lg border border-purple-100 dark:border-purple-800/50 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors"
+                                >
                                     <span className="font-medium text-purple-700 dark:text-purple-300 truncate mr-2">{deal.title}</span>
                                     <span className="font-bold text-purple-600 dark:text-purple-400 whitespace-nowrap">{deal.amount}</span>
                                 </div>
@@ -71,7 +87,11 @@ const ContactCard = ({ contact }) => {
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tasks</p>
                         <div className="space-y-1">
                             {associatedTasks.map(task => (
-                                <div key={task.id} className="flex items-center gap-2 text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                                <div
+                                    key={task.id}
+                                    onClick={(e) => handleTaskClick(e, task.id)}
+                                    className="flex items-center gap-2 text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg border border-blue-100 dark:border-blue-800/50 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                                >
                                     <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.completed ? 'bg-green-500' : 'bg-blue-500'}`} />
                                     <span className={`font-medium text-blue-700 dark:text-blue-300 truncate ${task.completed ? 'line-through opacity-70' : ''}`}>{task.title}</span>
                                 </div>
