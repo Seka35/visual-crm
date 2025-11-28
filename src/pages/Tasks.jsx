@@ -12,16 +12,21 @@ const Tasks = () => {
     const [editingTask, setEditingTask] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Check for openId query param
+    // Check for openId query param or create action
     React.useEffect(() => {
         const openId = searchParams.get('openId');
+        const action = searchParams.get('action');
+
         if (openId && tasks.length > 0) {
             const taskToOpen = tasks.find(t => t.id === openId);
             if (taskToOpen) {
                 handleEditTask(taskToOpen);
-                // Clear param
                 setSearchParams({}, { replace: true });
             }
+        } else if (action === 'create_task') {
+            setIsModalOpen(true);
+            setEditingTask(null);
+            setSearchParams({}, { replace: true });
         }
     }, [searchParams, tasks, setSearchParams]);
 

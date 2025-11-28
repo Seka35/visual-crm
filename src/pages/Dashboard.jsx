@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
 import WelcomeCard from '../components/dashboard/WelcomeCard';
@@ -144,11 +144,11 @@ const Dashboard = () => {
     const getItemClass = (id) => {
         switch (id) {
             case 'welcome': return 'col-span-1 md:col-span-2 lg:col-span-4';
-            case 'kpi': return 'col-span-1 md:col-span-2 lg:col-span-4';
+            case 'kpi': return 'col-span-1 md:col-span-2 lg:col-span-3';
             case 'pipeline': return 'col-span-1 md:col-span-2 lg:col-span-3';
             case 'debtPipeline': return 'col-span-1 md:col-span-2 lg:col-span-3';
 
-            case 'schedule': return 'col-span-1 md:col-span-1 lg:col-span-1';
+            case 'schedule': return 'col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-2';
             default: return 'col-span-1';
         }
     };
@@ -159,11 +159,11 @@ const Dashboard = () => {
 
             <DndContext
                 sensors={sensors}
-                collisionDetection={closestCenter}
+                collisionDetection={closestCorners}
                 onDragEnd={handleDragEnd}
             >
                 <SortableContext items={items} strategy={rectSortingStrategy}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 grid-flow-dense">
                         {items.map((id) => (
                             <SortableItem key={id} id={id} className={getItemClass(id)}>
                                 {renderWidget(id)}

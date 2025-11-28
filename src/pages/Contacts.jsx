@@ -14,9 +14,11 @@ const Contacts = () => {
     const [editingContact, setEditingContact] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Check for openId query param
+    // Check for openId query param or create action
     React.useEffect(() => {
         const openId = searchParams.get('openId');
+        const action = searchParams.get('action');
+
         if (openId && contacts.length > 0) {
             const contactToOpen = contacts.find(c => c.id === openId);
             if (contactToOpen) {
@@ -24,6 +26,10 @@ const Contacts = () => {
                 // Clear param
                 setSearchParams({}, { replace: true });
             }
+        } else if (action === 'create_contact') {
+            setIsModalOpen(true);
+            setEditingContact(null);
+            setSearchParams({}, { replace: true });
         }
     }, [searchParams, contacts, setSearchParams]);
 

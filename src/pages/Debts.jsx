@@ -14,25 +14,24 @@ const Debts = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDebt, setEditingDebt] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
-
-    // Check for openId query param
+    // Check for openId query param or create action
     React.useEffect(() => {
         const openId = searchParams.get('openId');
-        if (openId && Object.keys(columns).length > 0) {
-            let debtToOpen = null;
-            for (const key in columns) {
-                const found = columns[key].items.find(d => d.id === openId);
-                if (found) {
-                    debtToOpen = found;
-                    break;
-                }
-            }
+        const action = searchParams.get('action');
+
+        if (openId) {
+            // Find debt across all columns
+            const allDebts = Object.values(columns).flatMap(col => col.items);
+            const debtToOpen = allDebts.find(d => d.id === openId);
 
             if (debtToOpen) {
                 handleEditDebt(debtToOpen);
-                // Clear param
                 setSearchParams({}, { replace: true });
             }
+        } else if (action === 'create_debt') {
+            setIsModalOpen(true);
+            setEditingDebt(null);
+            setSearchParams({}, { replace: true });
         }
     }, [searchParams, columns, setSearchParams]);
 
