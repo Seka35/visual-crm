@@ -211,12 +211,8 @@ export const CRMProvider = ({ children }) => {
         const { data, error } = await tasksService.addTask(task, currentWorkflowId);
         if (error) {
             console.error('Error adding task:', error);
-            setError(error.message);
-            return null;
-        } else {
-            setTasks(prev => [data, ...prev]);
+            await loadTasks();
             await loadContacts();
-            return data;
         }
     };
 
@@ -226,7 +222,36 @@ export const CRMProvider = ({ children }) => {
             console.error('Error toggling task:', error);
             setError(error.message);
         } else {
+            const updatedTask = { ...tasks.find(t => t.id === id), completed: !tasks.find(t => t.id === id).completed };
             setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+
+            // If task is completed, clear reminders from linked Deals or Debts
+            if (updatedTask.completed) {
+                // Check Deals
+                for (const key in deals) {
+                    const deal = deals[key].items.find(d => d.related_task_id === id);
+                    if (deal) {
+                        await dealsService.updateDeal(deal.id, { reminder_date: null, reminder_time: null });
+                        await loadDeals();
+                        break;
+                    }
+                }
+
+                // Check Debts
+                let debtFound = null;
+                for (const key in debts) {
+                    const found = debts[key].items.find(d => d.related_task_id === id);
+                    if (found) {
+                        debtFound = found;
+                        break;
+                    }
+                }
+
+                if (debtFound) {
+                    await debtsService.updateDebt(debtFound.id, { reminderDate: null });
+                    await loadDebts();
+                }
+            }
         }
     };
 
@@ -341,9 +366,14 @@ export const CRMProvider = ({ children }) => {
                             await dealsService.updateDeal(id, { related_task_id: taskRes.id });
                         }
                     } else if (!hasReminder && hadReminder) {
-                        // Removed reminder -> Delete task
+                        // Removed reminder -> Delete task ONLY if it's not completed
                         if (taskId) {
-                            await deleteTask(taskId);
+                            // Check if task is completed
+                            const task = tasks.find(t => t.id === taskId);
+                            if (task && !task.completed) {
+                                await deleteTask(taskId);
+                            }
+                            // Always unlink from deal
                             await dealsService.updateDeal(id, { related_task_id: null });
                         }
                     } else if (hasReminder && taskId) {
@@ -391,8 +421,6 @@ export const CRMProvider = ({ children }) => {
             await loadContacts();
         }
     };
-
-
 
     // --- Events Functions ---
     const loadEvents = async () => {
@@ -449,23 +477,120 @@ export const CRMProvider = ({ children }) => {
     };
 
     const addDebt = async (debt) => {
-        const { data, error } = await debtsService.addDebt(debt, currentWorkflowId);
+        // Convert reminderDate to ISO string for DB if present
+        const dbDebt = { ...debt };
+        if (debt.reminderDate) {
+            dbDebt.reminderDate = new Date(debt.reminderDate).toISOString();
+        }
+
+        const { data, error } = await debtsService.addDebt(dbDebt, currentWorkflowId);
         if (error) {
             console.error('Error adding debt:', error);
             setError(error.message);
             return null;
         } else {
+            // Sync to Tasks if reminder is set
+            if (debt.reminderDate) {
+                try {
+                    // Use the original local time string for the task to preserve user intent
+                    const [datePart, timePart] = debt.reminderDate.split('T');
+
+                    const taskData = {
+                        title: `Follow up on debt: ${debt.borrowerName}`,
+                        description: `Reminder for debt: ${debt.description || 'No description'}\nAmount: ${debt.amountLent}`,
+                        dueDate: datePart,
+                        reminderTime: timePart || '09:00',
+                        contactIds: [], // Could link to contact if we had contact selection
+                        project: 'Debts',
+                        priority: 'high'
+                    };
+
+                    const { data: taskDataResponse, error: taskError } = await addTask(taskData);
+
+                    if (taskDataResponse && !taskError) {
+                        await debtsService.updateDebt(data.id, { related_task_id: taskDataResponse.id });
+                    }
+                } catch (e) {
+                    console.error("Error syncing debt to task", e);
+                }
+            }
+
             await loadDebts();
             return data;
         }
     };
 
     const updateDebt = async (id, updates) => {
-        const { data, error } = await debtsService.updateDebt(id, updates);
+        // Find current debt for context
+        let currentDebt = null;
+        for (const key in debts) {
+            const found = debts[key].items.find(d => d.id === id);
+            if (found) {
+                currentDebt = found;
+                break;
+            }
+        }
+
+        // Convert reminderDate to ISO string for DB if present
+        const dbUpdates = { ...updates };
+        if (updates.reminderDate) {
+            dbUpdates.reminderDate = new Date(updates.reminderDate).toISOString();
+        }
+
+        const { data, error } = await debtsService.updateDebt(id, dbUpdates);
         if (error) {
             console.error('Error updating debt:', error);
             setError(error.message);
         } else {
+            // Sync logic
+            if (currentDebt) {
+                try {
+                    const newDateStr = updates.reminderDate; // This is the local datetime string from input
+                    const hasNewReminder = !!newDateStr;
+                    const hadReminder = !!currentDebt.reminder_date;
+                    const taskId = currentDebt.related_task_id;
+
+                    if (hasNewReminder && (!hadReminder || !taskId)) {
+                        // Created reminder OR Reminder exists but no task (legacy) -> Create task
+                        const [datePart, timePart] = newDateStr.split('T');
+                        const taskData = {
+                            title: `Follow up on debt: ${updates.borrowerName || currentDebt.borrower_name}`,
+                            description: `Reminder for debt: ${updates.description || currentDebt.description || 'No description'}`,
+                            dueDate: datePart,
+                            reminderTime: timePart || '09:00',
+                            contactIds: [],
+                            project: 'Debts',
+                            priority: 'high'
+                        };
+                        const { data: taskRes } = await addTask(taskData);
+                        if (taskRes) {
+                            await debtsService.updateDebt(id, { related_task_id: taskRes.id });
+                        }
+                    } else if (!hasNewReminder && hadReminder && updates.reminderDate === null) {
+                        // Removed reminder -> Delete task ONLY if it's not completed
+                        if (taskId) {
+                            // Check if task is completed
+                            const task = tasks.find(t => t.id === taskId);
+                            if (task && !task.completed) {
+                                await deleteTask(taskId);
+                            }
+                            // Always unlink from debt
+                            await debtsService.updateDebt(id, { related_task_id: null });
+                        }
+                    } else if (hasNewReminder && taskId) {
+                        // Updated reminder -> Update task
+                        const [datePart, timePart] = newDateStr.split('T');
+                        await updateTask(taskId, {
+                            dueDate: datePart,
+                            reminderTime: timePart,
+                            title: updates.borrowerName ? `Follow up on debt: ${updates.borrowerName}` : undefined
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error syncing debt update to task", e);
+                }
+            }
+
             await loadDebts();
         }
     };
@@ -483,6 +608,20 @@ export const CRMProvider = ({ children }) => {
     };
 
     const deleteDebt = async (id) => {
+        // Find current debt to check for related task
+        let currentDebt = null;
+        for (const key in debts) {
+            const found = debts[key].items.find(d => d.id === id);
+            if (found) {
+                currentDebt = found;
+                break;
+            }
+        }
+
+        if (currentDebt && currentDebt.related_task_id) {
+            await deleteTask(currentDebt.related_task_id);
+        }
+
         const { error } = await debtsService.deleteDebt(id);
         if (error) {
             console.error('Error deleting debt:', error);

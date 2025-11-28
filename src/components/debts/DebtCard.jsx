@@ -97,10 +97,10 @@ const DebtCard = ({ debt, deal, onClick }) => {
                             <Calendar className="w-3.5 h-3.5" />
                             <span>{dateLent}</span>
                         </div>
-                        {reminderDate && (
-                            <div className="flex items-center gap-1.5 text-xs text-yellow-600 font-medium">
+                        {item.reminder_date && (
+                            <div className="flex items-center gap-1.5 text-xs text-yellow-600 font-medium bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-md">
                                 <AlertCircle className="w-3.5 h-3.5" />
-                                <span>{new Date(item.reminder_date).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                <span>{new Date(item.reminder_date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
                             </div>
                         )}
                     </div>
