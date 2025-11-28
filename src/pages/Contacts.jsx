@@ -5,11 +5,27 @@ import ContactList from '../components/contacts/ContactList';
 import ContactModal from '../components/contacts/ContactModal';
 import { useCRM } from '../context/CRMContext';
 
+import { useSearchParams } from 'react-router-dom';
+
 const Contacts = () => {
     const { contacts, addContact, updateContact, deleteContact } = useCRM();
     const [viewMode, setViewMode] = useState('grid');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContact, setEditingContact] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Check for openId query param
+    React.useEffect(() => {
+        const openId = searchParams.get('openId');
+        if (openId && contacts.length > 0) {
+            const contactToOpen = contacts.find(c => c.id === openId);
+            if (contactToOpen) {
+                handleEditContact(contactToOpen);
+                // Clear param
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [searchParams, contacts, setSearchParams]);
 
     const handleEditContact = (contact) => {
         setEditingContact(contact);

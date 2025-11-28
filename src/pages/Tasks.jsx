@@ -4,10 +4,26 @@ import TaskCard from '../components/tasks/TaskCard';
 import TaskModal from '../components/tasks/TaskModal';
 import { useCRM } from '../context/CRMContext';
 
+import { useSearchParams } from 'react-router-dom';
+
 const Tasks = () => {
     const { tasks, toggleTask, addTask, updateTask, deleteTask } = useCRM();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Check for openId query param
+    React.useEffect(() => {
+        const openId = searchParams.get('openId');
+        if (openId && tasks.length > 0) {
+            const taskToOpen = tasks.find(t => t.id === openId);
+            if (taskToOpen) {
+                handleEditTask(taskToOpen);
+                // Clear param
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [searchParams, tasks, setSearchParams]);
 
     const handleEditTask = (task) => {
         setEditingTask(task);

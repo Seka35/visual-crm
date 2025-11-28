@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import AIChat from './AIChat';
 import MobileNav from './MobileNav';
+import CommandCenter from './CommandCenter';
 
 const Layout = () => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -58,6 +59,9 @@ const Layout = () => {
                     <Skull className="w-8 h-8 group-hover:animate-pulse" />
                 </button>
             )}
+
+            {/* Command Center (Global Search) */}
+            <CommandCenter />
         </div>
     );
 };

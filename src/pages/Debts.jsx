@@ -6,11 +6,35 @@ import DebtCard from '../components/debts/DebtCard';
 import DebtModal from '../components/debts/DebtModal';
 import { useCRM } from '../context/CRMContext';
 
+import { useSearchParams } from 'react-router-dom';
+
 const Debts = () => {
     const { debts: columns, updateDebts: setColumns, moveDebt, addDebt, updateDebt, deleteDebt } = useCRM();
     const [activeId, setActiveId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDebt, setEditingDebt] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Check for openId query param
+    React.useEffect(() => {
+        const openId = searchParams.get('openId');
+        if (openId && Object.keys(columns).length > 0) {
+            let debtToOpen = null;
+            for (const key in columns) {
+                const found = columns[key].items.find(d => d.id === openId);
+                if (found) {
+                    debtToOpen = found;
+                    break;
+                }
+            }
+
+            if (debtToOpen) {
+                handleEditDebt(debtToOpen);
+                // Clear param
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [searchParams, columns, setSearchParams]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {

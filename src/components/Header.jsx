@@ -117,7 +117,7 @@ const Header = ({ onMenuClick }) => {
     };
 
     const handleResultClick = (result) => {
-        navigate(result.path);
+        navigate(`${result.path}?openId=${result.id}`);
         setSearchQuery('');
         setSearchResults([]);
         setIsSearchOpen(false);

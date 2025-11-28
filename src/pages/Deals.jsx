@@ -7,11 +7,35 @@ import DealCard from '../components/deals/DealCard';
 import DealModal from '../components/deals/DealModal';
 import { useCRM } from '../context/CRMContext';
 
+import { useSearchParams } from 'react-router-dom';
+
 const Deals = () => {
     const { deals: columns, updateDeals: setColumns, moveDeal, addDeal, updateDeal, deleteDeal } = useCRM();
     const [activeId, setActiveId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDeal, setEditingDeal] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Check for openId query param
+    React.useEffect(() => {
+        const openId = searchParams.get('openId');
+        if (openId && Object.keys(columns).length > 0) {
+            let dealToOpen = null;
+            for (const key in columns) {
+                const found = columns[key].items.find(d => d.id === openId);
+                if (found) {
+                    dealToOpen = found;
+                    break;
+                }
+            }
+
+            if (dealToOpen) {
+                handleEditDeal(dealToOpen);
+                // Clear param
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [searchParams, columns, setSearchParams]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
