@@ -46,6 +46,7 @@ export const CRMProvider = ({ children }) => {
 
     // --- Tasks State ---
     const [tasks, setTasks] = useState([]);
+    const [folders, setFolders] = useState([]);
 
     // --- Events State (Calendar) ---
     const [events, setEvents] = useState([]);
@@ -94,7 +95,7 @@ export const CRMProvider = ({ children }) => {
                     won: { id: 'won', title: 'Won', color: 'bg-success', items: [] }
                 });
                 setTasks([]);
-                setTasks([]);
+                setFolders([]);
                 setEvents([]);
                 setDebts({
                     lent: { id: 'lent', title: 'MONEY LENT', color: 'bg-red-500', items: [] },
@@ -120,7 +121,7 @@ export const CRMProvider = ({ children }) => {
             loadContacts(),
             loadDeals(),
             loadTasks(),
-            loadTasks(),
+            loadFolders(),
             loadEvents(),
             loadDebts()
         ]);
@@ -295,6 +296,28 @@ export const CRMProvider = ({ children }) => {
         } else {
             setTasks(prev => prev.filter(t => t.id !== id));
             await loadContacts();
+        }
+    };
+
+    const loadFolders = async () => {
+        const { data, error } = await tasksService.getFolders(currentWorkflowId);
+        if (error) {
+            console.error('Error loading folders:', error);
+            setError(error.message);
+        } else {
+            setFolders(data);
+        }
+    };
+
+    const addFolder = async (folder) => {
+        const { data, error } = await tasksService.createFolder(folder, currentWorkflowId);
+        if (error) {
+            console.error('Error adding folder:', error);
+            setError(error.message);
+            return { data: null, error };
+        } else {
+            setFolders(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
+            return { data, error: null };
         }
     };
 
@@ -798,7 +821,10 @@ export const CRMProvider = ({ children }) => {
             toggleTask,
             updateTask,
             deleteTask,
-            setTasks,
+
+            // Task Folders
+            folders,
+            addFolder,
 
             // Events
             events,

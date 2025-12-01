@@ -6,7 +6,6 @@ import { supabase } from '../lib/supabaseClient';
  */
 
 // Get all tasks for the current user
-// Get all tasks for the current user
 export const getTasks = async (workflowId = null) => {
     try {
         let query = supabase
@@ -24,6 +23,11 @@ export const getTasks = async (workflowId = null) => {
                         name,
                         avatar
                     )
+                ),
+                folder: task_folders (
+                    id,
+                    name,
+                    color
                 )
             `)
             .order('created_at', { ascending: false });
@@ -47,7 +51,10 @@ export const getTasks = async (workflowId = null) => {
             dueDate: task.due_date,
             reminderTime: task.reminder_time,
             priority: task.priority,
-            project: task.project,
+            project: task.project, // Keep for backward compatibility or fallback
+            folder: task.folder, // New folder object
+            folderId: task.folder_id,
+            urls: task.urls || [],
             assigneeAvatar: task.users?.avatar_url || task.assignee_avatar,
             assigneeName: task.users?.full_name || task.users?.email,
             completed: task.completed,
@@ -76,6 +83,11 @@ export const getTask = async (id) => {
                         name,
                         avatar
                     )
+                ),
+                folder: task_folders (
+                    id,
+                    name,
+                    color
                 )
             `)
             .eq('id', id)
@@ -85,7 +97,9 @@ export const getTask = async (id) => {
 
         const transformedData = {
             ...data,
-            contacts: data.task_contacts?.map(tc => tc.contact) || []
+            contacts: data.task_contacts?.map(tc => tc.contact) || [],
+            folder: data.folder,
+            urls: data.urls || []
         };
 
         return { data: transformedData, error: null };
@@ -111,6 +125,8 @@ export const addTask = async (task, workflowId = null) => {
             reminder_time: task.reminderTime || null,
             priority: task.priority || 'medium',
             project: task.project || 'General',
+            folder_id: task.folderId || null,
+            urls: task.urls || [],
             assignee_avatar: task.assigneeAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
             completed: task.completed || false
         };
@@ -118,7 +134,14 @@ export const addTask = async (task, workflowId = null) => {
         const { data, error } = await supabase
             .from('tasks')
             .insert([newTask])
-            .select()
+            .select(`
+                *,
+                folder: task_folders (
+                    id,
+                    name,
+                    color
+                )
+            `)
             .single();
 
         if (error) throw error;
@@ -156,6 +179,9 @@ export const addTask = async (task, workflowId = null) => {
             reminderTime: data.reminder_time,
             priority: data.priority,
             project: data.project,
+            folder: data.folder,
+            folderId: data.folder_id,
+            urls: data.urls || [],
             assigneeAvatar: data.assignee_avatar,
             completed: data.completed,
             contacts: associatedContacts
@@ -176,10 +202,12 @@ export const updateTask = async (id, updates) => {
         if (updates.title !== undefined) dbUpdates.title = updates.title;
         if (updates.description !== undefined) dbUpdates.description = updates.description;
         if (updates.date !== undefined) dbUpdates.date = updates.date;
-        if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate;
-        if (updates.reminderTime !== undefined) dbUpdates.reminder_time = updates.reminderTime;
+        if (updates.dueDate !== undefined) dbUpdates.due_date = updates.dueDate || null;
+        if (updates.reminderTime !== undefined) dbUpdates.reminder_time = updates.reminderTime || null;
         if (updates.priority !== undefined) dbUpdates.priority = updates.priority;
         if (updates.project !== undefined) dbUpdates.project = updates.project;
+        if (updates.folderId !== undefined) dbUpdates.folder_id = updates.folderId;
+        if (updates.urls !== undefined) dbUpdates.urls = updates.urls;
         if (updates.assigneeAvatar !== undefined) dbUpdates.assignee_avatar = updates.assigneeAvatar;
         if (updates.completed !== undefined) dbUpdates.completed = updates.completed;
 
@@ -187,7 +215,14 @@ export const updateTask = async (id, updates) => {
             .from('tasks')
             .update(dbUpdates)
             .eq('id', id)
-            .select()
+            .select(`
+                *,
+                folder: task_folders (
+                    id,
+                    name,
+                    color
+                )
+            `)
             .single();
 
         if (error) throw error;
@@ -231,6 +266,9 @@ export const updateTask = async (id, updates) => {
             reminderTime: data.reminder_time,
             priority: data.priority,
             project: data.project,
+            folder: data.folder,
+            folderId: data.folder_id,
+            urls: data.urls || [],
             assigneeAvatar: data.assignee_avatar,
             completed: data.completed,
             contacts: associatedContacts
@@ -284,5 +322,55 @@ export const deleteTask = async (id) => {
     } catch (error) {
         console.error('Error deleting task:', error);
         return { error };
+    }
+};
+
+// --- Folders Functions ---
+
+export const getFolders = async (workflowId = null) => {
+    try {
+        let query = supabase
+            .from('task_folders')
+            .select('*')
+            .order('name');
+
+        if (workflowId) {
+            query = query.eq('workflow_id', workflowId);
+        } else {
+            query = query.is('workflow_id', null);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return { data, error: null };
+    } catch (error) {
+        console.error('Error fetching folders:', error);
+        return { data: [], error };
+    }
+};
+
+export const createFolder = async (folder, workflowId = null) => {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const newFolder = {
+            name: folder.name,
+            color: folder.color,
+            workflow_id: workflowId,
+            created_by: user.id
+        };
+
+        const { data, error } = await supabase
+            .from('task_folders')
+            .insert([newFolder])
+            .select()
+            .single();
+
+        if (error) throw error;
+        return { data, error: null };
+    } catch (error) {
+        console.error('Error creating folder:', error);
+        return { data: null, error };
     }
 };

@@ -1,111 +1,107 @@
 import React from 'react';
-import { Calendar, Flag, CheckCircle, Circle, Pencil } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { Calendar, CheckCircle2, Circle, Clock, MoreVertical, Flag, Link, Folder } from 'lucide-react';
+import { useCRM } from '../../context/CRMContext';
 
-const TaskCard = ({ task, onToggle, onEdit }) => {
+const TaskCard = ({ task, onClick }) => {
+    const { toggleTask } = useCRM();
+
+    const handleToggle = (e) => {
+        e.stopPropagation();
+        toggleTask(task.id);
+    };
+
+    const getPriorityColor = (priority) => {
+        switch (priority) {
+            case 'high': return 'text-red-500 bg-red-50 dark:bg-red-900/20';
+            case 'medium': return 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20';
+            case 'low': return 'text-blue-500 bg-blue-50 dark:bg-blue-900/20';
+            default: return 'text-slate-500 bg-slate-50 dark:bg-slate-800';
+        }
+    };
+
+    const isOverdue = new Date(task.dueDate) < new Date() && !task.completed;
+
     return (
-        <div className={cn(
-            "glass-card p-4 rounded-xl flex items-center gap-4 group transition-all duration-300 dark:bg-slate-900/50 dark:border-slate-800",
-            task.completed && "opacity-60 bg-slate-50 dark:bg-slate-800/50"
-        )}>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onToggle(task.id);
-                }}
-                className="text-slate-300 hover:text-primary transition-colors"
-            >
-                {task.completed ? (
-                    <CheckCircle className="w-6 h-6 text-success" />
-                ) : (
-                    <Circle className="w-6 h-6" />
-                )}
-            </button>
+        <div
+            onClick={onClick}
+            className={`group bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden ${task.completed ? 'opacity-75' : ''}`}
+        >
+            {/* Priority Stripe */}
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${task.priority === 'high' ? 'bg-red-500' : task.priority === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'}`} />
 
-            <div className="flex-1">
-                <h4 className={cn(
-                    "font-bold text-slate-800 dark:text-white mb-1 transition-all",
-                    task.completed && "line-through text-slate-400 dark:text-slate-500"
-                )}>
-                    {task.title}
-                </h4>
-                <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>
-                            {task.dueDate
-                                ? new Date(task.dueDate).toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: new Date(task.dueDate).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
-                                })
-                                : 'No date'}
-                            {task.reminderTime && (
-                                <span className="ml-1 opacity-70">
-                                    • {task.reminderTime.slice(0, 5)}
-                                </span>
-                            )}
-                        </span>
-                    </div>
-                    {task.project && (
-                        <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md font-medium">
-                            {task.project}
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-                {task.priority === 'high' && (
-                    <div className="flex items-center gap-1 text-xs font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/20 px-2 py-1 rounded-lg">
-                        <Flag className="w-3.5 h-3.5 fill-current" />
-                        <span>High</span>
-                    </div>
-                )}
-                {task.priority === 'medium' && (
-                    <div className="flex items-center gap-1 text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/20 px-2 py-1 rounded-lg">
-                        <Flag className="w-3.5 h-3.5 fill-current" />
-                        <span>Medium</span>
-                    </div>
-                )}
-                {task.priority === 'low' && (
-                    <div className="flex items-center gap-1 text-xs font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-2 py-1 rounded-lg">
-                        <Flag className="w-3.5 h-3.5 fill-current" />
-                        <span>Low</span>
-                    </div>
-                )}
-
+            <div className="flex items-start gap-4 pl-2">
                 <button
-                    onClick={() => onEdit(task)}
-                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
+                    onClick={handleToggle}
+                    className={`mt-1 transition-colors ${task.completed ? 'text-success' : 'text-slate-300 hover:text-primary'}`}
                 >
-                    <Pencil className="w-4 h-4" />
+                    {task.completed ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
                 </button>
 
-                {task.contacts && task.contacts.length > 0 && (
-                    <div className="flex -space-x-2 mr-2">
-                        {task.contacts.slice(0, 3).map((contact) => (
-                            <img
-                                key={contact.id}
-                                src={contact.avatar}
-                                alt={contact.name}
-                                title={contact.name}
-                                className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 object-cover"
-                            />
-                        ))}
-                        {task.contacts.length > 3 && (
-                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-500">
-                                +{task.contacts.length - 3}
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                        <h3 className={`font-bold text-slate-800 dark:text-white truncate ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                            {task.title}
+                        </h3>
+                        {task.folder && (
+                            <span
+                                className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white whitespace-nowrap"
+                                style={{ backgroundColor: task.folder.color }}
+                            >
+                                {task.folder.name}
+                            </span>
+                        )}
+                    </div>
+
+                    {task.description && (
+                        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">
+                            {task.description}
+                        </p>
+                    )}
+
+                    <div className="flex items-center gap-4 mt-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {task.dueDate && (
+                            <div className={`flex items-center gap-1.5 ${isOverdue ? 'text-red-500' : ''}`}>
+                                <Calendar className="w-3.5 h-3.5" />
+                                <span>{new Date(task.dueDate).toLocaleDateString()}</span>
+                            </div>
+                        )}
+
+                        {task.reminderTime && (
+                            <div className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>{task.reminderTime}</span>
+                            </div>
+                        )}
+
+                        {task.urls && task.urls.length > 0 && (
+                            <div className="flex items-center gap-1.5 text-primary">
+                                <Link className="w-3.5 h-3.5" />
+                                <span>{task.urls.length} Link{task.urls.length > 1 ? 's' : ''}</span>
                             </div>
                         )}
                     </div>
-                )}
 
-                <img
-                    src={task.assigneeAvatar}
-                    alt=""
-                    className="w-8 h-8 rounded-full border-2 border-white"
-                />
+                    {/* Contacts Avatars */}
+                    {task.contacts && task.contacts.length > 0 && (
+                        <div className="flex -space-x-2 mt-3">
+                            {task.contacts.map((contact, i) => (
+                                <div key={contact.id} className="relative group/avatar">
+                                    {contact.avatar ? (
+                                        <img
+                                            src={contact.avatar}
+                                            alt={contact.name}
+                                            className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800"
+                                        />
+                                    ) : (
+                                        <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold">
+                                            {contact.name.charAt(0)}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -11,6 +11,16 @@ import { useSearchParams } from 'react-router-dom';
 
 const Deals = () => {
 
+    const { deals, addDeal, updateDeal, deleteDeal, moveDeal } = useCRM();
+    const [columns, setColumns] = useState(deals);
+    const [activeId, setActiveId] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingDeal, setEditingDeal] = useState(null);
+
+    React.useEffect(() => {
+        setColumns(deals);
+    }, [deals]);
+
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {

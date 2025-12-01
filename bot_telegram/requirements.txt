@@ -1,0 +1,8 @@
+python-telegram-bot
+supabase>=2.10.0
+openai
+python-dotenv
+pydub
+requests
+websockets>=13.0
+httpx>=0.28.0
