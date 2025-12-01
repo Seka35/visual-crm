@@ -174,8 +174,8 @@ const Debts = () => {
     };
 
     return (
-        <div className="h-full md:h-[calc(100vh-8rem)] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-6">
+            <div className="flex flex-col gap-4">
                 <div className="flex justify-between items-start">
                     <div>
                         <h2 className="text-6xl font-bold font-gta text-slate-800 dark:text-white mb-4">THE DEBTS</h2>
@@ -199,25 +199,23 @@ const Debts = () => {
                 onDragOver={handleDragOver}
                 onDragEnd={handleDragEnd}
             >
-                <div className="flex-1 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full md:min-w-fit px-1">
-                        {Object.values(columns).map((col) => (
-                            <KanbanColumn
-                                key={col.id}
-                                id={col.id}
-                                title={col.title}
-                                count={col.items.length}
-                                total={col.items.reduce((acc, item) => {
-                                    const amount = parseFloat(item.amount_lent.replace(/[^0-9.-]+/g, '') || 0);
-                                    return acc + amount;
-                                }, 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}
-                                color={col.color}
-                                deals={col.items}
-                                onDealClick={handleEditDebt}
-                                CardComponent={DebtCard}
-                            />
-                        ))}
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {Object.values(columns).map((col) => (
+                        <KanbanColumn
+                            key={col.id}
+                            id={col.id}
+                            title={col.title}
+                            count={col.items.length}
+                            total={col.items.reduce((acc, item) => {
+                                const amount = parseFloat(item.amount_lent.replace(/[^0-9.-]+/g, '') || 0);
+                                return acc + amount;
+                            }, 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}
+                            color={col.color}
+                            deals={col.items}
+                            onDealClick={handleEditDebt}
+                            CardComponent={DebtCard}
+                        />
+                    ))}
                 </div>
 
                 <DragOverlay>
