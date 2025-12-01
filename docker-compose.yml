@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: visual-crm-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+
+  telegram-bot:
+    build: ./bot_telegram
+    container_name: telegram-bot
+    restart: unless-stopped
+    env_file:
+      - ./bot_telegram/.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
