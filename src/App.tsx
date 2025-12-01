@@ -16,7 +16,7 @@ import { WorkflowProvider } from './context/WorkflowContext';
 import { ThemeProvider } from './context/ThemeContext';
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { user, authLoading } = useCRM();
 
     if (authLoading) {
@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 // Public Route Component (redirects to dashboard if already logged in)
-const PublicRoute = ({ children }) => {
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     const { user, authLoading } = useCRM();
 
     if (authLoading) {
